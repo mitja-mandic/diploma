@@ -10,6 +10,7 @@ def varianca(vektor):
 
 
 def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.001):
+    
     """
     n neodvisnih, bernulijevih slučajnih spremenljivk ~ Ber(pi)
     
@@ -22,7 +23,8 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
     info dimenzije: (r+1,r+1)
     var dimenzije: (n,n)
     """
-
+    #vektor_skupin = np.reshape(vektor_skupin, (np.shape(vektor_skupin)[0],))
+    
     #začetni podatki
     matrika = np.array(matrika)
     #print(np.shape(matrika))
@@ -38,7 +40,7 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
     #print(np.shape(zacetna_varianca))
  
 
-    zacetni_score = np.matmul(np.transpose(matrika), (vektor_rezultatov - zacetni_p))
+    zacetni_score = np.matmul(np.transpose(matrika), (vektor_rezultatov -  zacetni_p))
     #print(np.shape(vektor_rezultatov - zacetni_p))
 
     zacetni_info = np.matmul(np.matmul(np.transpose(matrika), zacetna_varianca),matrika)
@@ -51,10 +53,11 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
     #print(beta_star)
     iteracije = 0
     
-    #zacetni_h = np.linalg.solve(zacetni_info,zacetni_score)
+    zacetni_h = np.linalg.solve(zacetni_info,zacetni_score)
     #print(zacetni_h)
 
-    beta_nov = beta_star + np.matmul(np.linalg.inv(zacetni_info), zacetni_score)
+    #beta_nov = beta_star + np.matmul(np.linalg.inv(zacetni_info), zacetni_score)
+    beta_nov = beta_star + zacetni_h
     #print(beta_nov)
     while True:
         if iteracije - 1 > max_iteracij:
@@ -70,11 +73,14 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
             
             score = np.matmul(np.transpose(matrika), (vektor_rezultatov - p))
 
+            h = np.linalg.solve(info, score)
+
             beta_star = beta_nov
-            beta_nov = beta_star + np.matmul(np.linalg.inv(info), score)
-            print(beta_nov)
+            #beta_nov = beta_star + np.matmul(np.linalg.inv(info), score)
+            beta_nov = beta_star + h
+            #print(beta_nov)
             iteracije += 1
-    parametri = {'var-kovar' : var, 'parametri' : beta_nov}
+    parametri = {'var-kovar' : var, 'parametri' : beta_nov, 'p':p}
     #print(parametri)
     return parametri
 
@@ -85,3 +91,8 @@ matrika = podatki[['dodatna','TEMPERATURE']].values
 vrednosti_y = podatki[['O_RING_FAILURE']].values
 
 rešitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
+
+
+
+
+print(rešitev['parametri'])

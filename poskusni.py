@@ -11,5 +11,7 @@ def varianca(vektor):
 w = p_i(a) * p_i(1-a)
 b = np.array([[1],[2],[3]])
 y = p_i(b) * p_i(1-b)
-print(np.diag(y[:,0]))
+
+
+print(np.ones(np.shape(a)[0],))
 #print(varianca(a))
