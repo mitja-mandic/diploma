@@ -4,12 +4,12 @@ import pandas as pd
 def p_i(vektor):
     return np.exp(vektor)/(1+np.exp(vektor))
 
-def varianca(vektor):
-    return np.diag(np.array(vektor) * (1 - np.array(vektor)))
+def varianca(vektor, skupine):
+    return np.diag(np.array(skupine) * (np.array(vektor) * (1 - np.array(vektor))))
 
 
 
-def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.001):
+def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin = None, zacetni_beta = None, epsilon=0.001):
     
     """
     n neodvisnih, bernulijevih slučajnih spremenljivk ~ Ber(pi)
@@ -23,25 +23,36 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
     info dimenzije: (r+1,r+1)
     var dimenzije: (n,n)
     """
-    #vektor_skupin = np.reshape(vektor_skupin, (np.shape(vektor_skupin)[0],))
+    n = np.shape(vektor_rezultatov)[0]
+    r_plus1 = np.shape(matrika)[1]
+
+    if all(vektor_skupin == None):
+        vektor_skupin = np.ones((np.shape(vektor_rezultatov)[0],))
+    else:
+        vektor_skupin = np.reshape(vektor_skupin, (n,))
     
+    #if all(zacetni_beta == None):
+    #    zacetni_beta = np.array(np.zeros(np.shape(matrika)[1]))
+    #else:
+    #    zacetni_beta = np.reshape(zacetni_beta, (r_plus1,))
     #začetni podatki
     matrika = np.array(matrika)
     #print(np.shape(matrika))
     
-    vektor_rezultatov = np.reshape(vektor_rezultatov, (np.shape(vektor_rezultatov)[0],))
+    vektor_rezultatov = np.reshape(vektor_rezultatov, (n,))
 
     zacetni_beta = np.array(np.zeros(np.shape(matrika)[1]))
     #print(np.shape(zacetni_beta))
 
     zacetni_p = np.array(p_i(np.matmul(matrika, zacetni_beta)))
     #print(zacetni_p)
-    zacetna_varianca = varianca(zacetni_p)
-    #print(np.shape(zacetna_varianca))
+    zacetna_varianca = varianca(zacetni_p, vektor_skupin)
+    
+    print(np.shape(zacetna_varianca))
  
 
-    zacetni_score = np.matmul(np.transpose(matrika), (vektor_rezultatov -  zacetni_p))
-    #print(np.shape(vektor_rezultatov - zacetni_p))
+    zacetni_score = np.matmul(np.transpose(matrika), (vektor_rezultatov -  vektor_skupin * zacetni_p))
+    print(np.shape(vektor_rezultatov - zacetni_p))
 
     zacetni_info = np.matmul(np.matmul(np.transpose(matrika), zacetna_varianca),matrika)
     
@@ -67,11 +78,11 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
         else:
             p = p_i(np.matmul(matrika, beta_nov))
 
-            var = varianca(p)
+            var = varianca(p, vektor_skupin)
             
             info = np.matmul(np.matmul(np.transpose(matrika), var), matrika) #matrika je (23,2) var je  (2,2)
             
-            score = np.matmul(np.transpose(matrika), (vektor_rezultatov - p))
+            score = np.matmul(np.transpose(matrika), (vektor_rezultatov - vektor_skupin * p))
 
             h = np.linalg.solve(info, score)
 
@@ -85,14 +96,26 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov, epsilon=0.00
     return parametri
 
 
-podatki = pd.read_csv("podatki.txt")
-podatki['dodatna'] = 1
-matrika = podatki[['dodatna','TEMPERATURE']].values
-vrednosti_y = podatki[['O_RING_FAILURE']].values
-
-rešitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
-
-
+#podatki = pd.read_csv("podatki.txt")
+#podatki['dodatna'] = 1
+#matrika = podatki[['dodatna','TEMPERATURE']].values
+#vrednosti_y = podatki[['O_RING_FAILURE']].values
+#print(podatki[['dodatna']])
+#print(podatki.columns)
 
 
-print(rešitev['parametri'])
+#rešitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
+
+podatki_hrosci = pd.read_csv('SC1_11_beetles.txt')
+skupine = podatki_hrosci[['n']].values
+podatki_hrosci['dodatna'] = 1
+conc_kvadrat = podatki_hrosci[['conc']].pow(2)
+podatki_hrosci['conc_kvadrat'] = conc_kvadrat
+matrika = podatki_hrosci[['dodatna','conc','conc_kvadrat']].values
+
+vrednost_y = podatki_hrosci[['y']].values
+
+beta_ena = np.full((3,),np.log(sum(vrednost_y)/sum(skupine-vrednost_y)))
+
+resitev = izracunaj_koeficiente(20, matrika, vrednost_y, skupine)
+print(resitev['parametri'])
