@@ -9,7 +9,7 @@ def varianca(vektor, skupine):
 
 
 
-def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin = None, zacetni_beta = None, epsilon=0.001):
+def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin = [], zacetni_beta = [], epsilon=0.001):
     
     """
     n neodvisnih, bernulijevih slučajnih spremenljivk ~ Ber(pi)
@@ -26,15 +26,16 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
     n = np.shape(vektor_rezultatov)[0]
     r_plus1 = np.shape(matrika)[1]
 
-    if all(vektor_skupin == None):
+    if not any(np.array(vektor_skupin)):
         vektor_skupin = np.ones((np.shape(vektor_rezultatov)[0],))
     else:
         vektor_skupin = np.reshape(vektor_skupin, (n,))
     
-    #if all(zacetni_beta == None):
-    #    zacetni_beta = np.array(np.zeros(np.shape(matrika)[1]))
-    #else:
-    #    zacetni_beta = np.reshape(zacetni_beta, (r_plus1,))
+    if not any(np.array(zacetni_beta)):
+        zacetni_beta = np.array(np.zeros(np.shape(matrika)[1]))
+    else:
+        zacetni_beta = np.reshape(zacetni_beta, (r_plus1,))
+    
     #začetni podatki
     matrika = np.array(matrika)
     #print(np.shape(matrika))
@@ -118,4 +119,5 @@ vrednost_y = podatki_hrosci[['y']].values
 beta_ena = np.full((3,),np.log(sum(vrednost_y)/sum(skupine-vrednost_y)))
 
 resitev = izracunaj_koeficiente(20, matrika, vrednost_y, skupine)
+
 print(resitev['parametri'])
