@@ -5,6 +5,9 @@
 \usepackage{pgfpages} % privat zapiski
 \usepackage{amsmath} % pravilen izpis v "math mode"
 \usepackage{hyperref}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\pgfplotsset{compat=1.8}
 \hypersetup{hidelinks}
 %\usetheme{Bergen}
 \usecolortheme{seahorse}
@@ -24,20 +27,82 @@
     \title[Diplomski seminar]{Iterativne numerične metode v posplošenih linearnih modelih}
     \author[Mitek]{Mitja Mandić \\ \small Mentor: izred. prof. dr. Jaka Smrekar}
     \date{20. november 2020} 
+
 \begin{frame}
     \titlepage
 \end{frame}
 
-\begin{frame} \frametitle{Statistični modeli}
-    Neki povem na splošno o modelih
+\begin{frame} \frametitle{Posplošeni linearni modeli}
+    \begin{itemize}
+    
+        \item Slučajni del, sistematični del, povezovalna funkcija
+        \pause
+        \item Linearna regresija: 
+            $$ Y = x ^ T\beta + \epsilon $$
+        \item Problem - ni najboljša. Rešitev? Transformacija Y
+    \end{itemize}
 \end{frame}
 
-\begin{frame} \frametitle{Statistični modeli - primer}
-    Mal vse skup razložim Logit, zakaj pa kako, mogoče kaka enačbica pade
+\begin{frame} \frametitle{Logistični model}
+    \begin{itemize}
+    \item Za binarne podatke $\rightarrow$ binomska porazdelitev
+    \pause
+    \item $ \text{logit}(p_{i}) = \log (\frac{p_{i}}{1 - p_{i}}) = x ^ T\beta $ %\rightarrow p_{i} = \frac{ e^{x^T\beta}}{1 + e^{x^T\beta}} $
+
+    \item Sedaj je treba izračunati $\beta$ $\rightarrow$ Numerične metode
+
+\end{itemize}
+
+%\begin{figure}    treba še naštudirat da bo graf prou
+%\centering
+%    \begin{tikzpicture}[transform canvas={scale=0.5}]
+%        
+%        \begin{axis}%
+%        [
+%            grid=major,     
+%            xmin=-10,
+%            xmax=10,
+%            axis x line=bottom,
+%            ytick={0,.5,1},
+%            ymax=1,
+%            axis y line=middle,
+%        ]
+%            \addplot%
+%            [
+%                blue,%
+%                mark=none,
+%                samples=100,
+%                domain=-6:6,
+%            ]
+%            (x,{1/(1+exp(-x))});
+%        \end{axis}
+%    \end{tikzpicture}
+%\end{figure}
 \end{frame}
+
 
 \begin{frame}\frametitle{Numerične metode}
-    Zakaj iterativne? Katere sploh so aktualne?
+    \begin{itemize}
+        \item Za ocenjevanje parametrov $\beta$ običajno rešujemo sistem enačb največjega verjetja
+        \pause
+        %\item v splošnem ni eksplicitno rešljiv
+        \item Newtonova metoda še vedno zelo aktualna:
+        $$ x_{i+1} = x_{i} - \frac{f'(x_{i})}{f''(x_{i})} $$
+        %\pause
+        
+        \item Izboljšava: Fisher-scoring  
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Fisher Scoring}
+
+    $$ \beta_{i+1} = \beta_{i} + \frac{\dot{l(\beta_{i})}}{E(\ddot{l(\beta_{i}))}} $$
+    
+    \begin{itemize}
+        \item za logistično regresijo sovpadata z Newtonovo metodo
+        \item Informacijska matrika je pozitivno definitna $\rightarrow$ imamo naraščajoč algoritem
+    \end{itemize}
+
 \end{frame}
 
 \begin{frame}{Kaj sem že naredil}

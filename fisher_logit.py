@@ -1,5 +1,6 @@
 import numpy as np 
-import pandas as pd 
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def p_i(vektor):
     return np.exp(vektor)/(1+np.exp(vektor))
@@ -12,7 +13,6 @@ def varianca(vektor, skupine):
 def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin = [], zacetni_beta = [], epsilon=0.001):
     
     """
-    n neodvisnih, bernulijevih slučajnih spremenljivk ~ Ber(pi)
     
     logistični model predpostavlja: logit(pi) = 1*beta_0 + x_i1*beta_1 + ... + x_ir*beta_r
     
@@ -53,7 +53,7 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
  
 
     zacetni_score = np.matmul(np.transpose(matrika), (vektor_rezultatov -  vektor_skupin * zacetni_p))
-    print(np.shape(vektor_rezultatov - zacetni_p))
+    #print(np.shape(vektor_rezultatov - zacetni_p))
 
     zacetni_info = np.matmul(np.matmul(np.transpose(matrika), zacetna_varianca),matrika)
     
@@ -77,15 +77,17 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
         if all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
             break
         else:
-            p = p_i(np.matmul(matrika, beta_nov))
-
+            p = p_i(np.matmul(matrika, beta_nov)) # n * (r+1) operacij
             var = varianca(p, vektor_skupin)
-            
-            info = np.matmul(np.matmul(np.transpose(matrika), var), matrika) #matrika je (23,2) var je  (2,2)
-            
-            score = np.matmul(np.transpose(matrika), (vektor_rezultatov - vektor_skupin * p))
+            print(np.shape(matrika), np.shape(var))
+            #print(np.shape(var))
+            info = np.matmul(np.matmul(np.transpose(matrika), var), matrika) #matrika je (23,2) var je  (23,23). produkt 2x23 * 23x23 * 23x2
+            #v info množiš r+1xn * nxn * nxr+1
 
-            h = np.linalg.solve(info, score)
+            #print(np.shape(info))
+            score = np.matmul(np.transpose(matrika), (vektor_rezultatov - vektor_skupin * p)) # r+1xn * nx1
+
+            h = np.linalg.solve(info, score) #r+1xr+1
 
             beta_star = beta_nov
             #beta_nov = beta_star + np.matmul(np.linalg.inv(info), score)
@@ -97,27 +99,56 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
     return parametri
 
 
-#podatki = pd.read_csv("podatki.txt")
-#podatki['dodatna'] = 1
-#matrika = podatki[['dodatna','TEMPERATURE']].values
-#vrednosti_y = podatki[['O_RING_FAILURE']].values
+podatki = pd.read_csv("podatki.txt")
+podatki['dodatna'] = 1
+matrika = podatki[['dodatna','TEMPERATURE']].values
+vrednosti_y = podatki[['O_RING_FAILURE']].values
 #print(podatki[['dodatna']])
 #print(podatki.columns)
+resitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
+
+#podatki_hrosci = pd.read_csv('SC1_11_beetles.txt')
+#skupine = podatki_hrosci[['n']].values
+#podatki_hrosci['dodatna'] = 1
+#conc_kvadrat = podatki_hrosci[['conc']].pow(2)
+#podatki_hrosci['conc_kvadrat'] = conc_kvadrat
+#matrika = podatki_hrosci[['dodatna','conc','conc_kvadrat']].values
+#
+#vrednost_y = podatki_hrosci[['y']].values
+#
+#beta_ena = np.full((3,),np.log(sum(vrednost_y)/sum(skupine-vrednost_y)))
+#
+#resitev = izracunaj_koeficiente(20, matrika, vrednost_y, skupine)
+#
+fitted = resitev['p']
+
+intercept = resitev['parametri'][0]
+slope = resitev['parametri'][1]
+#slope1 = resitev['parametri'][2]
 
 
-#rešitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
+#print(fitted)
 
-podatki_hrosci = pd.read_csv('SC1_11_beetles.txt')
-skupine = podatki_hrosci[['n']].values
-podatki_hrosci['dodatna'] = 1
-conc_kvadrat = podatki_hrosci[['conc']].pow(2)
-podatki_hrosci['conc_kvadrat'] = conc_kvadrat
-matrika = podatki_hrosci[['dodatna','conc','conc_kvadrat']].values
+def main():
+    x = np.linspace(40,90,1000)
+    #y = np.exp(intercept + x * slope + (x ** 2) * slope1) / (1 + np.exp(intercept + x * slope + (x ** 2) * slope1))
+    y = np.exp(intercept + x * slope)/ (1 + np.exp(intercept + x * slope))
+    #plt.figure()
+    plt.plot(x, y)
+    #plt.xlabel('$x$')
+    #plt.ylabel('$\exp(x)$')
 
-vrednost_y = podatki_hrosci[['y']].values
+    #plt.plot(podatki_hrosci[['conc']].values,fitted, 'o')
+    plt.plot(podatki[['TEMPERATURE']].values,fitted, 'o')
+    plt.plot(podatki[['TEMPERATURE']].values, podatki[['O_RING_FAILURE']].values,'o')
 
-beta_ena = np.full((3,),np.log(sum(vrednost_y)/sum(skupine-vrednost_y)))
 
-resitev = izracunaj_koeficiente(20, matrika, vrednost_y, skupine)
+    #plt.figure()
+    #plt.plot(x, -np.exp(-x))
+    #plt.xlabel('$x$')
+    #plt.ylabel('$-\exp(-x)$')
 
-print(resitev['parametri'])
+    plt.show()
+
+if __name__ == '__main__':
+    main()
