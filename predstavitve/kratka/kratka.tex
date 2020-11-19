@@ -7,6 +7,9 @@
 \usepackage{hyperref}
 \usepackage{pgfplots}
 \usepackage{tikz}
+%\documentclass{standalone}
+%\usepackage{pgfplotstable,filecontents}
+
 \pgfplotsset{compat=1.8}
 \hypersetup{hidelinks}
 %\usetheme{Bergen}
@@ -23,6 +26,8 @@
 \setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}
 \setbeamertemplate{itemize items}[circle]
 
+
+
 \begin{document}
     \title[Diplomski seminar]{Iterativne numerične metode v posplošenih linearnih modelih}
     \author[Mitek]{Mitja Mandić \\ \small Mentor: izred. prof. dr. Jaka Smrekar}
@@ -38,46 +43,52 @@
         \item Slučajni del, sistematični del, povezovalna funkcija
         \pause
         \item Linearna regresija: 
-            $$ Y = x ^ T\beta + \epsilon $$
+            $$ Y = x ^ T\beta $$
         \item Problem - ni najboljša. Rešitev? Transformacija Y
     \end{itemize}
 \end{frame}
 
 \begin{frame} \frametitle{Logistični model}
     \begin{itemize}
-    \item Za binarne podatke $\rightarrow$ binomska porazdelitev
+    \item Za kategorične podatke $\rightarrow$ binomska porazdelitev
     \pause
-    \item $ \text{logit}(p_{i}) = \log (\frac{p_{i}}{1 - p_{i}}) = x ^ T\beta $ %\rightarrow p_{i} = \frac{ e^{x^T\beta}}{1 + e^{x^T\beta}} $
+    \item $ \mathrm{logit}(p_{i}) = \mathrm{log} (\frac{p_{i}}{1 - p_{i}}) = x ^ T\beta $ %\rightarrow p_{i} = \frac{ e^{x^T\beta}}{1 + e^{x^T\beta}} $
+    %\item Sedaj je treba izračunati $\beta$ $\rightarrow$ Numerične metode
 
-    \item Sedaj je treba izračunati $\beta$ $\rightarrow$ Numerične metode
+    \end{itemize}
+\end{frame}
 
-\end{itemize}
+\begin{frame}
 
-%\begin{figure}    treba še naštudirat da bo graf prou
-%\centering
-%    \begin{tikzpicture}[transform canvas={scale=0.5}]
-%        
-%        \begin{axis}%
-%        [
-%            grid=major,     
-%            xmin=-10,
-%            xmax=10,
-%            axis x line=bottom,
-%            ytick={0,.5,1},
-%            ymax=1,
-%            axis y line=middle,
-%        ]
-%            \addplot%
-%            [
-%                blue,%
-%                mark=none,
-%                samples=100,
-%                domain=-6:6,
-%            ]
-%            (x,{1/(1+exp(-x))});
-%        \end{axis}
-%    \end{tikzpicture}
-%\end{figure}
+
+$$p = \frac{e^{x^T\beta}}{1+e^{x^T\beta}}$$
+\begin{figure}   % treba še naštudirat da bo graf prou
+\begin{center}
+    \begin{tikzpicture}
+        
+        \begin{axis}%
+        [
+            grid=major,     
+            xmin=-10,
+            xmax=10,
+            axis x line=bottom,
+            ytick={0,.5,1},
+            ymax=1,
+            axis y line=middle,
+        ]
+            \addplot%
+            [
+                blue,%
+                mark=none,
+                samples=100,
+                domain=-6:6,
+            ]
+            (x,{1/(1+exp(-x))});
+        \end{axis}
+    \end{tikzpicture}
+
+\end{center}
+\end{figure}
 \end{frame}
 
 
@@ -94,9 +105,9 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Fisher Scoring}
+\begin{frame}{Fisher scoring}
 
-    $$ \beta_{i+1} = \beta_{i} + \frac{\dot{l(\beta_{i})}}{E(\ddot{l(\beta_{i}))}} $$
+    $$ \beta_{i+1} = \beta_{i} + \frac{\dot{l}(\beta_{i})}{E(\ddot{l}(\beta_{i}))} $$
     
     \begin{itemize}
         \item za logistično regresijo sovpadata z Newtonovo metodo
@@ -105,11 +116,34 @@
 
 \end{frame}
 
-\begin{frame}{Kaj sem že naredil}
-    Mal rezultati pa tko
+\begin{frame}{Fisher scoring za logistični model}
+    \begin{gather*}
+        \hat{\beta}_{i+1} = \hat{\beta}_{i} + (X^T  v(\hat{\beta}_{i}) X) ^{-1}  X^T (y - \mu(\hat{\beta}_{i})) \\
+         = \hat{\beta}_{i} + \text{(inverz info)(score)}
+    \end{gather*}
+    \pause
+    Računanje inverza je lahko problematično. To rešimo takole:
+    \begin{gather*}
+        h = \hat{\beta}_{i+1} - \hat{\beta}_{i} \\
+        X^T  v(\hat{\beta}_{i}) X = h * X^T (y - \mu(\hat{\beta}_{i}))
+    \end{gather*}
+\end{frame}
+
+\begin{frame}{Challenger podatki}
+    \centering
+    $p = \frac{e^{15.04290 - 0.23216x}}{1+e^{15.04290 - 0.23216x}}$
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.6]{logit_challenger.jpeg}
+\end{figure}
+
 \end{frame}
 
 \begin{frame}{Kaj še bom naredil}
-    Mal bl na splošno še raziskal kako pa kaj
+    \begin{itemize}
+        \item Analiziral časovno zahtevnost že postavljenega algoritma
+        \item Izvedel podobno še za kak drugačen model
+        \item Teorijo razvil še za splošen posplošen linearen model
+    \end{itemize}
 \end{frame}
 \end{document}

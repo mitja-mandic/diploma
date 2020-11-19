@@ -121,9 +121,9 @@ resitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
 #resitev = izracunaj_koeficiente(20, matrika, vrednost_y, skupine)
 #
 fitted = resitev['p']
-
 intercept = resitev['parametri'][0]
 slope = resitev['parametri'][1]
+print(intercept,slope)
 #slope1 = resitev['parametri'][2]
 
 
@@ -134,14 +134,14 @@ def main():
     #y = np.exp(intercept + x * slope + (x ** 2) * slope1) / (1 + np.exp(intercept + x * slope + (x ** 2) * slope1))
     y = np.exp(intercept + x * slope)/ (1 + np.exp(intercept + x * slope))
     #plt.figure()
-    plt.plot(x, y)
+    plt.plot(x, y, label = 'Logit')
     #plt.xlabel('$x$')
     #plt.ylabel('$\exp(x)$')
 
     #plt.plot(podatki_hrosci[['conc']].values,fitted, 'o')
-    plt.plot(podatki[['TEMPERATURE']].values,fitted, 'o')
-    plt.plot(podatki[['TEMPERATURE']].values, podatki[['O_RING_FAILURE']].values,'o')
-
+    plt.plot(podatki[['TEMPERATURE']].values,fitted, 'o',label = 'Izračunane verjetnosti')
+    plt.plot(podatki[['TEMPERATURE']].values, podatki[['O_RING_FAILURE']].values,'o', label = 'Podatki')
+    plt.legend()
 
     #plt.figure()
     #plt.plot(x, -np.exp(-x))
