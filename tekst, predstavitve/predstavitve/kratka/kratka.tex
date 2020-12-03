@@ -9,6 +9,9 @@
 \usepackage{tikz}
 %\documentclass{standalone}
 %\usepackage{pgfplotstable,filecontents}
+\usepackage[natbib=true,style=authoryear,backend=bibtex,useprefix=true]{biblatex}
+\addbibresource{literatura_test}
+
 
 \pgfplotsset{compat=1.8}
 \hypersetup{hidelinks}
@@ -145,5 +148,11 @@ $$p = \frac{e^{x^T\beta}}{1+e^{x^T\beta}}$$
         \item Izvedel podobno še za kak drugačen model
         \item Teorijo razvil še za splošen posplošen linearen model
     \end{itemize}
+\end{frame}
+
+\begin{frame}[t,allowframebreaks]
+    \frametitle{References}
+    \nocite{*}
+    \printbibliography
 \end{frame}
 \end{document}
