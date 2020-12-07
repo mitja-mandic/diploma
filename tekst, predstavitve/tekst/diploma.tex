@@ -11,7 +11,8 @@
 \usepackage{url}
 %\usepackage[normalem]{ulem}
 \usepackage[dvipsnames,usenames]{color}
-
+\usepackage{eurosym}
+\usepackage{mathtools}
 % ne spreminjaj podatkov, ki vplivajo na obliko strani
 \textwidth 15cm
 \textheight 24cm
@@ -102,11 +103,11 @@ Ljubljana, \letnica}
 V povzetku na kratko opi"si vsebinske rezultate dela. Sem ne sodi razlaga organizacije dela -- v katerem poglavju/razdelku je kaj, pa"c pa le opis vsebine.
 \vfill
 \begin{center}
-{\bf Angle"ski naslov dela}\\[3mm] % prevod slovenskega naslova dela
+{\bf Iterative numerical methods in generalized linear models}\\[3mm] % prevod slovenskega naslova dela
 {\sc Abstract}
 \end{center}
 % tekst povzetka v anglescini
-Prevod zgornjega povzetka v angle"s"cino.
+
 
 \vfill\noindent
 {\bf Math. Subj. Class. (2010):} navedi vsaj eno klasifikacijsko oznako -- dostopne so na \url{www.ams.org/mathscinet/msc/msc2010.html}  \\[1mm]
@@ -118,12 +119,144 @@ Prevod zgornjega povzetka v angle"s"cino.
 
 % tu se zacne besedilo seminarja
 \section{Uvod}
+Posplošeni linearni modeli so ključen del statistične analize. Pomagajo nam bolje razumeti relacije med rezultati meritev in s temi izsledki
+predvideti trende v prihodnosti. Modeli morajo biti kar se da enostavni, ampak hkrati zagotavljati določeno natančnost. Vsa teorija nam pa v praksi
+ne koristi, če konkretnih številk ne znamo izračunati.
+
+V dobi ogromne množice podatkov je računska učinkovitost ključni del obdelave. Tu nam pomagajo numerične metode.
+
+V delu bom najprej predstavil posplošene linearne modele in najpriljubljenejše numerične metode, ki se uporabljajo za njihovo obdelavo. 
+Teorijo bom osvetlil tudi s praktičnimi primeri.
+
+\section{Posplošeni linearni modeli}
+
+\subsection{Sestavni deli posplošenega linearnega modela}
+Vsak posplošeni linearni model sestavljajo trije deli: \textit{slučajni del} je slučajna spremenljivka $Y$ in njena porazdelitev, 
+\textit{sistematični del} predstavlja relacijo med pojasnjevalnimi spremenljivkami, \textit{povezovalna funkcija} pa transformira $Y$, da se ta
+bolje prilega podatkom.
+
+\subsubsection{Slučajni del}
+\textit{Slučajni del} privzame porazdelitev slučajnega vektorja $Y$, pri čemer privzemamo tudi neodvisnost komponent. Porazdelitev $Y$
+privzemamo odvisno od podatkov; mnogokrat je ,,binarna``, torej ima dve možni vrednosti - ,,uspeh`` ali ,,neuspeh``. Splošneje je lahko izid tudi 
+število uspehov v fiksnem številu poskusov. V takih primerih privzamemo binomsko porazdelitev. $Y$ nam lahko meri tudi števne podatke, naprimer 
+koliko zabav je obiskal študent v preteklem mesecu. Seveda pa lahko $Y$ predstavlja tudi zvezne podatke,
+v tem primeru lahko privzamemo normalno porazdelitev (ali pa kakšno drugo zvezno porazdelitev).
+
+\subsubsection{Sistematični del} 
+\textit{Sistematična komponenta} posplošenega linearnega modela poda relacije med pojasnjevalnimi spremenljivkami $x_{i,j}$. Te nastopajo 
+linearno, torej je sistematični del enak
+\[
+\beta_{0} + x_{i,1}\beta_{1} + x_{i,2}\beta_{2} + \ldots + x_{i,p}\beta_{p}
+\]
 
 
+\subsubsection{Povezovalna funkcija}
+Tretji del posplošenega linearnega modela je \textit{povezovalna funkcija}, ta nam poda funkcijo $g(\cdot)$ med slučajno komponento
+in sistematičnim delom. Če označimo $\mu = E(Y)$, je
+\[
+    g(\mu) = \beta_{0} + x_{i,1}\beta_{1} + x_{i,2}\beta_{2} + \ldots + x_{i,p}\beta_{p}
+\]
+Najenostavnejša taka funkcija je kar identiteta, torej $g(\mu) = \mu$. Ta nam torej da linearno povezavo med pojasnjevalnimi spremenljivkami 
+in pričakovano vrednostjo naših slučajnih spremenljivki. To je ena od oblik regresije za zvezne podatke.
+
+Mnogokrat pa linearna relacija ni primerna - fiksna sprememba pojasnjevalnih spremenljivk ima lahko večji vpliv, če je pričakovana vrednost 
+bližje 0, kot če je bližje 1. Recimo, da je $\pi$ verjetnost, da bo oseba kupila nov avto, ko je njen dohodek enak $x$. Sprememba v dohodku
+za 10.000\euro~ima manjši vpliv, če je dohodek 1.000.000\euro,~kot če je 50.000\euro.
+
+Takrat je smiselno uporabiti kakšno drugo povezovalno funkcijo, ki dopušča tudi nelinearne kombinacije pojasnjevalnih
+spremenljivk. Naprimer, $g(\mu) = \log(\mu)$ modelira
+pričakovano vrednost logaritma. Smiselno jo je uporabiti, če pričakovana vrednost ne more zavzeti negativnih vrednosti. Takemu modelu rečemo
+\textit{log-linearen} model.
+
+Spet druga povezovalna funkcija je $\mathrm{logit}(\mu) = \log(\frac{\mu}{1-\mu})$, ki nam modelira logaritem deležev - smiselno jo je uporabiti, 
+ko $\mu$ ne zavzame vrednosti izven $(0,1)$, torej ko imamo opravka z verjetnostmi. Takemu modelu rečemo logistični model.
+
+%\subsection{Primeri posplošenih linearnih modelov}
+
+\subsection{Linearna regresija}
+
+Linearna regresija je najenostavnejši primer posplošenega linearnega modela. Enostavno jo lahko zapišemo kot:
+$
+    Y = X \beta + \varepsilon
+$
+kjer je $Y$ proučevan slučajni vektor, $X$ je matrika pojasnjevalnih slučajnih spremenljivk, $\beta$ je vektor koeficientov, ki jih želimo oceniti,
+$\varepsilon$ pa slučajna spremenljivka, ki predstavlja napako - pri računanju, meritvah \ldots. Privzemimo, da je $E(\varepsilon) = 0$. Iz tega sledi
+$\mu = E(Y) = X\beta$. Model torej pričakovano vrednost slučajne spremenljivke predstavi kot linearno funkcijo pojasnjevalnih spremenljivk.
+Parametre $\beta$ ocenimo z metodo najmanjših kvadratov in ob predpostavki polnega ranga za matriko $X$ dobimo $\hat{\beta} =  (X^\top X)^{-1}
+X^\top Y$. 
 
 
+\subsection{Poissonova regresija}
+
+\subsection{Logistična regresija}
+Logistična regresija se uporablja za določanje deležev oziroma računanje verjetnosti. V poštev pride, ko imamo odgovore tipa uspeh-neuspeh oziroma
+govorimo o prisotnosti ali odsotnosti neke lastnosti.
+
+Spomnimo se Binomske porazdelitve $Y_{i} \sim B(n_{i}, p_{i})$. Ta pravi, da je 
+\[
+    P(Y_{i} = y_{i}) = {n_{i} \choose y_{i}} p_{i}^{y_{i}}(1 - p_{i}) ^{n_{i} - y_{i}}
+\]
+Pričakovana vrednost in varianca sta odvisni le od $p_{i}$, in sta enaki $E(Y_{i}) = p_{i} \text{in} Var(Y_{i}) = p_{i}(1 - p_{i})$.
+Poglejmo si sedaj podrobneje \textit{logit} transformacijo. Če se spomnemo, želimo določiti verjetnost nekega dogodka pri danih podatkih. Ob uporabi
+identitente transformacije se nam kaj hitro lahko zgodi, da za posamezne verjetnosti dobimo vrednosti izven intervala $[0,1]$. Ta problem bomo rešili v 
+dveh korakih.
+
+Najprej uvedimo 
+\[ 
+    \mathrm{delež}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
+\]
+kjer se premaknemo iz verjetnosti v \textit{deleže} -- verjetnost dogodka proti verjetnosti, da se ne bo zgodil. Če je $p_{i}$ enak $\frac{1}{2}$, 
+bo delež enak 1. Vidimo, da so deleži vedno pozitivni in niso omejeni navzgor
+
+V naslednjem koraku pa poglejmo logaritem deležev ali logit verjetnosti
+\[
+    \eta_{i} = \mathrm{logit}(p_{i}) = \log \frac{p_{i}}{1 - p_{i}}
+\]
+s tem pa si odstranimo tudi omejitev navzdol. Opazimo še, da če je $p_{i} = \frac{1}{2}$, je delež enak 1 in je logaritem 0. Kot funkcija p, je logit
+strogo naraščajoča, torej imamo inverz. Običajno ga imenujemo \textit{antilogit}, izrazimo ga z:
+\[
+    p_{i} = \mathrm{logit}(\eta_{i}) = \frac{\exp{\eta_{i}}}{1+\exp{\eta_{i}}}
+\]
+Vse skupaj nam da \textit{logistični model}, ki za slučajni del vzame binomsko porazdelitev. %VPRAŠAJ KAJ JE Z NAPAKO
+
+\subsubsection{Ocenjevanje parametrov}
+Imamo binomske slučajne spremenljivke in imamo povezovalno funkcijo, $\mathrm{}{logit p_{i}} = X\beta$, kjer so $\beta$ neznani parametri.
+V naslednjem razdelku si bomo ogledali kako zanje izpeljemo enačbe verjetja, ki jih nato uporabimo v numeričnih algoritmih.
+
+Kot v vsakem posplošenem linearnem modelu tudi v tem predpostavimo neodvisnost komponent slučajnega vektorja $\mathrm{Y}$ zato 
+\begin{align*}
+    P(Y = \vec{y}) &= \prod_{i=1}^{n} P(Y_{i} = y_{i}) \\
+                    &=\prod_{i=1}^{n} {n_{i} \choose y_{i}} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}}
+\end{align*}
+Naprej si oglejmo logaritemsko funkcijo verjetja. V nadaljnem računanju bom izpuščal binomski simbol na začetku - je samo konstanta, ki na
+končen rezultat nima vpliva. Po prejšnjih oznakah je torej
+\begin{align}
+    \ell(p_{i}) &= \log\{\prod_{i=1}^{n} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}} \} \nonumber  \\
+        
+        &= \sum_{i=1}^{n}\{y_{i}\log{p_{i}} + (n_{i} - y_{i})\log(1 - p_{i})\} \nonumber \\
+        
+        &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\}
+\end{align}
+
+Po predpostavki logističnega modela je 
+\[
+   \mathrm{logit}(p_{i}) = \log\left( \frac{p_{i}}{1-p_{i}}  \right) = \beta_{0} + x_{i1}\beta_{1} + \ldots + x_{ir}\beta_{r} = x_{i}^\top \beta 
+\]
 
 
+\subsection{Probit regresija}
+
+\subsection{Ocenjevanje parametrov}
+
+\section{Numerične metode}
+
+\subsection{Newton -- Raphsonova metoda}
+
+\subsection{Fisher-scoring algoritem}
+
+\section{Primeri}
+\subsection{Ocenjevanje parametrov v logističnem modelu}
+\subsection{Ocenjevanje parametrov v probit modelu}
 
 % slovar
 \section*{Slovar strokovnih izrazov}
