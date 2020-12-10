@@ -13,6 +13,7 @@
 \usepackage[dvipsnames,usenames]{color}
 \usepackage{eurosym}
 \usepackage{nicefrac}
+
 \usepackage{mathtools}
 % ne spreminjaj podatkov, ki vplivajo na obliko strani
 \textwidth 15cm
@@ -305,7 +306,7 @@ Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $
 V sledečih razdelkih si bomo od bliže pogledali nekaj numeričnih metod, uporabljenih v kasnejših zgledih. Te metode slonijo na stoletja starih
 idejah, ki smo jih spoznali tekom študija, uporabljajo pa se tudi v številnih praktičnih aplikacijah.
 
-\subsection{Newton -- Raphsonova metoda}
+\subsection{Newton -- Raphsonova metoda} \label{nr}
 Newton -- Raphson (oziroma le Newtonova) metoda je bila v osnovi razvita za iskanje ničel funkcije. V najosnovnejši (ter najpogostejši) verziji za iskanje
 ničle funkcije ene spremenljivke začnemo v neki točki, naslendnjo pa izberemo v presčišču tangente, izračunane v 
 tej točki, z x-osjo. Postopek tako iterativno nadaljujemo. Ideja je torej sila preprosta, za izpeljavo pa tudi ni potrebno preveč truda.
@@ -327,11 +328,11 @@ težavami se bomo soočili v nadaljevanju.
 Imamo torej algoritem, ki najde ničlo, v luči iskanja cenilke največjega verjetja pa bi želeli algoritem, ki poišče maksimum oziroma minimum funkcije.
 Recimo, da imamo neko logaritemsko funkcijo verjetja $L$, in trenutni približek $\theta_{n}$. Razvijmo funkcijo okoli približka v Taylorjev polinom
 druge stopnje:
-\begin{align}\label{taylor}
-    L(\theta) \approx L(\theta_{n}) + dL(\theta_{n})(\theta - \theta_{n}) + \frac{1}{2}(\theta - \theta_{n})^\top d^{2}L(\theta_{n})(\theta - \theta_{n})    
+\begin{align}
+    L(\theta) \approx L(\theta_{n}) + dL(\theta_{n})(\theta - \theta_{n}) + \frac{1}{2}(\theta - \theta_{n})^\top d^{2}L(\theta_{n})(\theta - \theta_{n}) \label{taylor}   
 \end{align}
 
-Maksimizirati želimo desno stran \ref{taylor}. To storimo tako, da gradient $L$ enačimo z nič:
+Maksimizirati želimo desno stran \eqref{taylor}. To storimo tako, da gradient $L$ enačimo z nič:
 \[
     \nabla L(\theta_{n}) + \nabla^2L(\theta_{n})(\theta - \theta_{n}) = 0  
 \]
@@ -349,7 +350,7 @@ Težavo z računanjem inverza rešimo tako, da namesto invertiranja problem prev
     x_{n + 1} &= x_{n} + p_{n} \nonumber\\
     \nabla^2L(\theta_{n})p_{n} &= -\nabla L(\theta_{n})
 \end{align}
-Zadnji vrstici v \ref{newtoneq} rečemo tudi \textit{Newtonova enačba}.
+Zadnji vrstici v \eqref{newtoneq} rečemo tudi \textit{Newtonova enačba}.
 
 Radi bi še dosegli, da bi se Newtonov algoritem premikal v eno smer, torej naraščal ali padal. S tem bi vedeli, kaj se bo zgodilo v iteraciji in lažje predvideli morebitne
 nevšečnosti. Newtonova metoda za iskanje minimuma (maksimum) funkcije je optimizacijski problem drugega reda in realna funkcija ima globalni minimum (maksimum) tam, kjer je
@@ -374,9 +375,49 @@ verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških s
 Uvedimo najprej nekaj terminologije. Zbirna funkcija (angl. \textit{score function}) je gradient funkcije največjega verjetja po ocenjevanem parametru. 
 Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher) information matrix}) je definirana kot 
 \[
-    I(\theta) = \mathrm{E}[\nabla L(\theta) \nabla L(\theta)^\top ].
+    I(\theta) = \mathrm{E}[\nabla L(\theta) \nabla L(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
 \]
 
+Fisher scoring algoritem sedaj je po zgornjih oznakah 
+\begin{align}
+    \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\nabla L(\theta)
+\end{align}
+
+\subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
+V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikazali njegovo glavno prednost pred običajno Newtonovo iteracijo, opisano v poglavju \ref{nr}.
+
+Ob določenih predpostavkah o gladkosti logaritemske funkcije verjetja (ki za eksponentno družino vedno držijo), bomo sedaj pokazali, da je pričakovana vrednost
+zbirne funkcije enaka nič
+\begin{align} \label{Ezbirne}
+    \mathrm{E}(\dot{\ell}_{\theta}) &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
+        &= \int \nabla f_{\theta}(x) \,dx \overset{*}{=} \nabla \int f_{\theta}(x) \,dx = \nabla 1 = 0, 
+\end{align}
+kjer smo v enakosti $(*)$ zamenjali integracijo in odvajanje, kar po teoriji mere smemo - gostota porazdelitev eksponentne družine je zvezno odvedljiva. 
+
+Velja tudi
+\[
+    \nabla^{2} \log{f_{\theta}(x)} = \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \frac{\nabla f_{\theta}(x) \nabla f_{\theta}(x)^\top }{f_{\theta}(x)^{2}} = 
+    \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \dot{\ell}(\theta)\dot{\ell}(\theta)^\top,
+\]
+kjer smo v zadnji enakosti upoštevali
+\[
+    \dot{\ell}(\theta) = \nabla \log(f_{\theta}(x)) = \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} 
+\]
+Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
+\begin{align}\label{infoeq}
+    I(\theta) &= \mathrm{E}[\dot{\ell}(\theta)\dot{\ell}(\theta)^\top] =  -\int f_{\theta}(x) \nabla^2 log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
+    &= -\mathrm{E}[\nabla^2 log f_{\theta}(x)] + \nabla^2\int \nabla^2 log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 log f_{\theta}(x)]
+\end{align}
+Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
+
+Kot smo videli v prejšnjih poglavjih, želimo imeti pozitivno semi-definitno matriko in s tem monoton algoritem. Izkaže se, da je informacijska matrika ravno variančno-kovariančna matrika
+zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vrednost zbirne funckije enaka 0. Potem takoj sledi
+\begin{align}
+    I(\theta) &= \mathrm{E}[\dot{\ell}(\theta)\dot{\ell}(\theta)^\top] \nonumber\\
+    &= \mathrm{E}[\left(\dot{\ell}(\theta) - \mathrm{E}[\dot{\ell}(\theta)]\right)\left(\dot{\ell}(\theta) - \mathrm{E}[\dot{\ell}(\theta)]\right)^\top] \nonumber \\
+    &= \mathrm{Var}[\dot{\ell}(\theta)].
+\end{align}
+Variančno-kovariančne matrike pa so pozitivno semi-definitne.
 
 \section{Primeri}
 \subsection{Ocenjevanje parametrov v logističnem modelu}
