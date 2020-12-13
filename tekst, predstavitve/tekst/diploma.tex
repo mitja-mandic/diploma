@@ -13,6 +13,13 @@
 \usepackage[dvipsnames,usenames]{color}
 \usepackage{eurosym}
 \usepackage{nicefrac}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=black,  %choose some color if you want links to stand out
+}
 
 \usepackage{mathtools}
 % ne spreminjaj podatkov, ki vplivajo na obliko strani
@@ -207,7 +214,7 @@ dveh korakih.
 
 Najprej uvedimo 
 \[ 
-    \mathrm{delež}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
+    \mathrm{delez}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
 \]
 kjer se premaknemo iz verjetnosti v \textit{deleže} -- verjetnost dogodka proti verjetnosti, da se ne bo zgodil. Če je $p_{i}$ enak $\frac{1}{2}$, 
 bo delež enak 1. Vidimo, da so deleži vedno pozitivni in niso omejeni navzgor.
@@ -229,7 +236,7 @@ pojasnjevalne spremenljivke) in dobimo $\nicefrac{\partial}{\partial x_{j}} = \b
 vpliva tako verjetnost kot tudi parameter $\beta$. Običajno se za analizo vzame vzorčno povprečje verjetnosti opazovane vrednosti.
 
 
-\subsubsection{Ocenjevanje parametrov}
+\subsubsection{Ocenjevanje parametrov}\label{ocenpar}
 Imamo binomske slučajne spremenljivke in imamo povezovalno funkcijo, $\mathrm{}{logit p_{i}} = X\beta$, kjer so $\beta$ neznani parametri.
 V naslednjem razdelku si bomo ogledali kako zanje izpeljemo enačbe verjetja, ki jih nato uporabimo v numeričnih algoritmih.
 
@@ -240,7 +247,7 @@ Kot v vsakem posplošenem linearnem modelu tudi v tem predpostavimo neodvisnost 
 \end{align*}
 Naprej si oglejmo logaritemsko funkcijo verjetja. V nadaljnem računanju bom izpuščal binomski simbol na začetku - je samo konstanta, ki na
 končen rezultat nima vpliva. Po prejšnjih oznakah je torej
-\begin{align}
+\begin{align}\label{logit1}
     \ell(p_{i}) &= \log\{\prod_{i=1}^{n} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}} \} \nonumber  \\
         &= \sum_{i=1}^{n}\{y_{i}\log{p_{i}} + (n_{i} - y_{i})\log(1 - p_{i})\} \nonumber \\
         &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\}
@@ -299,7 +306,53 @@ Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $
     \ddot{\ell}(\beta) = -\sum_{i=1}^{n}\left(x_{ij}x_{ik}v_{i}(\beta)\right).
 \end{align}
 
+Zapišimo zgoraj izpeljane zveze v berljivejšo matrično notacijo. 
+\begin{equation*}
+    \log \left(\frac{p}{1-p}\right) = \mathrm{X}\beta
+\end{equation*}
+Vektorsko definiramu tudi
+\[
+    \exp{\mathrm{X}\beta} = \begin{bmatrix}
+                            \exp{x_{1}^\top\beta} \\
+                            \vdots\\
+                            \exp{x_{n}^\top\beta}
 
+                            \end{bmatrix},
+\]
+spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo
+\begin{align} \label{ell}
+    \ell(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
+    &= y^\top\mathrm{X}\beta - n^\top \log(1 + \exp{\mathrm{X}\beta}),
+\end{align}
+in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
+\begin{align}
+    \dot{\ell}(\beta) = \mathrm{X}^\top(y - m\circ p(\beta)),
+\end{align}
+kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
+
+S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komponent in torej lahko zapišemo
+\begin{equation}
+    \mathrm{E}(Y) = m \circ p(\beta) \equiv \mu(\beta),
+\end{equation}
+in lahko končno vse povzamemo v
+\begin{align}\label{prvi}
+    \dot{\ell}(\beta) = X^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
+\end{align}
+
+Ostane nam le še dvojni odvod. Najprej si oglejmo
+\[
+    v(\beta) = \begin{bmatrix}
+        v_{1}(\beta)  & & &\\
+        & v_{2}(\beta) & & \\
+        & & \ddots & \\
+        & & & v_{n}(\beta)
+    \end{bmatrix},
+\]
+iz tega potem takoj sledi, da je
+\begin{equation} \label{drugi}
+    \ddot{\ell}(\beta) = -\mathrm{X}^\top v(\beta)\mathrm{X},
+\end{equation}
+torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 \subsection{Probit regresija}
 
 \section{Numerične metode}
@@ -375,21 +428,21 @@ verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških s
 Uvedimo najprej nekaj terminologije. Zbirna funkcija (angl. \textit{score function}) je gradient funkcije največjega verjetja po ocenjevanem parametru. 
 Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher) information matrix}) je definirana kot 
 \[
-    I(\theta) = \mathrm{E}[\nabla L(\theta) \nabla L(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
+    I(\theta) = \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
 \]
 
 Fisher scoring algoritem sedaj je po zgornjih oznakah 
 \begin{align}
-    \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\nabla L(\theta)
+    \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\dot{\ell}(\theta)
 \end{align}
 
 \subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
 V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikazali njegovo glavno prednost pred običajno Newtonovo iteracijo, opisano v poglavju \ref{nr}.
 
 Ob določenih predpostavkah o gladkosti logaritemske funkcije verjetja (ki za eksponentno družino vedno držijo), bomo sedaj pokazali, da je pričakovana vrednost
-zbirne funkcije enaka nič
+zbirne funkcije enaka nič. Tu smo $\ell(\theta)$ označili z $\log f_{\theta}(x)$.
 \begin{align} \label{Ezbirne}
-    \mathrm{E}(\dot{\ell}_{\theta}) &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
+    \mathrm{E}[\dot{\ell}_{\theta}] &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
         &= \int \nabla f_{\theta}(x) \,dx \overset{*}{=} \nabla \int f_{\theta}(x) \,dx = \nabla 1 = 0, 
 \end{align}
 kjer smo v enakosti $(*)$ zamenjali integracijo in odvajanje, kar po teoriji mere smemo - gostota porazdelitev eksponentne družine je zvezno odvedljiva. 
@@ -405,8 +458,8 @@ kjer smo v zadnji enakosti upoštevali
 \]
 Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
 \begin{align}\label{infoeq}
-    I(\theta) &= \mathrm{E}[\dot{\ell}(\theta)\dot{\ell}(\theta)^\top] =  -\int f_{\theta}(x) \nabla^2 log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
-    &= -\mathrm{E}[\nabla^2 log f_{\theta}(x)] + \nabla^2\int \nabla^2 log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 log f_{\theta}(x)]
+    I(\theta) &= \mathrm{E}[\dot{\ell}(\theta)\dot{\ell}(\theta)^\top] =  -\int f_{\theta}(x) \nabla^2 \log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
+    &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \nabla^2 \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
 \end{align}
 Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
 
@@ -418,6 +471,18 @@ zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vred
     &= \mathrm{Var}[\dot{\ell}(\theta)].
 \end{align}
 Variančno-kovariančne matrike pa so pozitivno semi-definitne.
+
+\subsubsection{Fisher's scoring v logističnem modelu}
+Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
+\[
+    I(\theta) = \mathrm{E}[-\ddot{\ell}(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\ddot{\ell}(\theta),
+\]
+kjer smo seveda uporabili tudi prej dokazano informacijsko enakost. Tako vidimo, da Fisher's scoring in Newton--Raphsonova metoda v primeru logistične regresije
+res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. Če zapišemo sedaj vse skupaj
+\begin{align}
+    \hat{\beta}_{i+1} = \hat{\beta}_{i} - (\ddot(\ell))
+\end{align}
+
 
 \section{Primeri}
 \subsection{Ocenjevanje parametrov v logističnem modelu}
