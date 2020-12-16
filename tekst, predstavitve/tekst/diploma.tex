@@ -308,11 +308,11 @@ Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $
 
 Zapišimo zgoraj izpeljane zveze v berljivejšo matrično notacijo. 
 \begin{equation*}
-    \log \left(\frac{p}{1-p}\right) = \mathrm{X}\beta
+    \log \left(\frac{p}{1-p}\right) = \mathbf{X}\beta
 \end{equation*}
 Vektorsko definiramu tudi
 \[
-    \exp{\mathrm{X}\beta} = \begin{bmatrix}
+    \exp{\mathbf{X}\beta} = \begin{bmatrix}
                             \exp{x_{1}^\top\beta} \\
                             \vdots\\
                             \exp{x_{n}^\top\beta}
@@ -322,11 +322,11 @@ Vektorsko definiramu tudi
 spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo
 \begin{align} \label{ell}
     \ell(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
-    &= y^\top\mathrm{X}\beta - n^\top \log(1 + \exp{\mathrm{X}\beta}),
+    &= y^\top\mathbf{X}\beta - n^\top \log(1 + \exp{\mathbf{X}\beta}),
 \end{align}
 in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
 \begin{align}
-    \dot{\ell}(\beta) = \mathrm{X}^\top(y - m\circ p(\beta)),
+    \dot{\ell}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
 \end{align}
 kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
 
@@ -336,7 +336,7 @@ S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komp
 \end{equation}
 in lahko končno vse povzamemo v
 \begin{align}\label{prvi}
-    \dot{\ell}(\beta) = X^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
+    \dot{\ell}(\beta) = \mathbf{X}^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
 \end{align}
 
 Ostane nam le še dvojni odvod. Najprej si oglejmo
@@ -350,7 +350,7 @@ Ostane nam le še dvojni odvod. Najprej si oglejmo
 \]
 iz tega potem takoj sledi, da je
 \begin{equation} \label{drugi}
-    \ddot{\ell}(\beta) = -\mathrm{X}^\top v(\beta)\mathrm{X},
+    \ddot{\ell}(\beta) = -\mathbf{X}^\top v(\beta)\mathbf{X},
 \end{equation}
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 \subsection{Probit regresija}
@@ -425,15 +425,18 @@ Tako vidimo, da imamo strogo padajoč algoritem.
 Fisher's scoring algoritem je variacija v prejšnjem razdelku opisanega Newton -- Raphsonovega algoritma, ki se v statistiki uporablja za numerično reševanje enačb največjega 
 verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških statistikov dvajsetega stoletja.
 
-Uvedimo najprej nekaj terminologije. Zbirna funkcija (angl. \textit{score function}) je gradient funkcije največjega verjetja po ocenjevanem parametru. 
+Uvedimo najprej nekaj terminologije in oznak. Kot v prejšnjih poglavijh, imamo veliko opravka logaritemsko funckijo verjetja (angl. \textit{log-likelihood function}), ki jo tu označimo 
+z $L = \log \left(f(x_{1},\theta)\ldots f(x_{n},\theta) \right),$ ki jo obravnavamo kot funkcijo parametra $\theta$ pri fiksnem vzorcu. Po drugi strani pa je to
+tudi transformacija porazdelitvene funkcije slučajnega vektorja $X = (X_{1},X_{2},\ldots,X_{n}),$ kjer privzamemo neodvisnost komponent (kar pa seveda velja v vseh
+modelih, ki jih obravnavamo v tej nalogi). Zbirna funkcija (angl. \textit{score function}) je gradient logaritemske funkcije največjega verjetja po ocenjevanem parametru. 
 Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher) information matrix}) je definirana kot 
 \[
-    I(\theta) = \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
+    I(\theta) = \mathrm{E}[\nabla L(\theta) \nabla L(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
 \]
 
 Fisher scoring algoritem sedaj je po zgornjih oznakah 
 \begin{align}
-    \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\dot{\ell}(\theta)
+    \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\nabla L(\theta)
 \end{align}
 
 \subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
@@ -442,7 +445,7 @@ V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikaza
 Ob določenih predpostavkah o gladkosti logaritemske funkcije verjetja (ki za eksponentno družino vedno držijo), bomo sedaj pokazali, da je pričakovana vrednost
 zbirne funkcije enaka nič. Tu smo $\ell(\theta)$ označili z $\log f_{\theta}(x)$.
 \begin{align} \label{Ezbirne}
-    \mathrm{E}[\dot{\ell}_{\theta}] &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
+    \mathrm{E}[\nabla L (\theta)] &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
         &= \int \nabla f_{\theta}(x) \,dx \overset{*}{=} \nabla \int f_{\theta}(x) \,dx = \nabla 1 = 0, 
 \end{align}
 kjer smo v enakosti $(*)$ zamenjali integracijo in odvajanje, kar po teoriji mere smemo - gostota porazdelitev eksponentne družine je zvezno odvedljiva. 
@@ -454,11 +457,11 @@ Velja tudi
 \]
 kjer smo v zadnji enakosti upoštevali
 \[
-    \dot{\ell}(\theta) = \nabla \log(f_{\theta}(x)) = \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} 
+    \nabla L (\theta) = \nabla \log(f_{\theta}(x)) = \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} 
 \]
 Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
 \begin{align}\label{infoeq}
-    I(\theta) &= \mathrm{E}[\dot{\ell}(\theta)\dot{\ell}(\theta)^\top] =  -\int f_{\theta}(x) \nabla^2 \log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
+    I(\theta) &= \mathrm{E}[\nabla L(\theta)(\nabla L(\theta))^\top] =  -\int f_{\theta}(x) \nabla^2 \log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
     &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \nabla^2 \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
 \end{align}
 Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
@@ -466,21 +469,22 @@ Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo ko
 Kot smo videli v prejšnjih poglavjih, želimo imeti pozitivno semi-definitno matriko in s tem monoton algoritem. Izkaže se, da je informacijska matrika ravno variančno-kovariančna matrika
 zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vrednost zbirne funckije enaka 0. Potem takoj sledi
 \begin{align}
-    I(\theta) &= \mathrm{E}[\dot{\ell}(\theta)\dot{\ell}(\theta)^\top] \nonumber\\
-    &= \mathrm{E}[\left(\dot{\ell}(\theta) - \mathrm{E}[\dot{\ell}(\theta)]\right)\left(\dot{\ell}(\theta) - \mathrm{E}[\dot{\ell}(\theta)]\right)^\top] \nonumber \\
-    &= \mathrm{Var}[\dot{\ell}(\theta)].
+    I(\theta) &= \mathrm{E}[\nabla L(\theta)\nabla L(\theta)^\top] \nonumber\\
+    &= \mathrm{E}[\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)^\top] \nonumber \\
+    &= \mathrm{Var}[\nabla L(\theta)].
 \end{align}
 Variančno-kovariančne matrike pa so pozitivno semi-definitne.
 
 \subsubsection{Fisher's scoring v logističnem modelu}
 Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
 \[
-    I(\theta) = \mathrm{E}[-\ddot{\ell}(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\ddot{\ell}(\theta),
+    I(\theta) = \mathrm{E}[-\nabla ^2 L(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\nabla ^2 L(\theta),
 \]
 kjer smo seveda uporabili tudi prej dokazano informacijsko enakost. Tako vidimo, da Fisher's scoring in Newton--Raphsonova metoda v primeru logistične regresije
 res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. Če zapišemo sedaj vse skupaj
 \begin{align}
-    \hat{\beta}_{i+1} = \hat{\beta}_{i} - (\ddot(\ell))
+    \hat{\theta}_{i+1} &= \hat{\theta}_{i} - (\nabla^{2} L(\hat{\theta}_{i}))^{-1} \nabla L(\hat{\theta}_{i}) \nonumber \\
+    &= \hat{\theta}_{i} + (\mathbf{X}^\top v(\hat{\theta}_{i}) \mathbf{X})^{-1}\mathbf{X}^\top(y - \mu(\hat{\theta}_{i})) 
 \end{align}
 
 
