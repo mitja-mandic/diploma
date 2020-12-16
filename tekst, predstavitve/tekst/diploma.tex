@@ -22,6 +22,8 @@
 }
 
 \usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{pgfplots}
 % ne spreminjaj podatkov, ki vplivajo na obliko strani
 \textwidth 15cm
 \textheight 24cm
@@ -150,15 +152,12 @@ privzemamo odvisno od podatkov; mnogokrat je ,,binarna``, torej ima dve možni v
 število uspehov v fiksnem številu poskusov. V takih primerih privzamemo binomsko porazdelitev. $Y$ nam lahko meri tudi števne podatke, naprimer 
 koliko zabav je obiskal študent v preteklem mesecu. Seveda pa lahko $Y$ predstavlja tudi zvezne podatke,
 v tem primeru lahko privzamemo normalno porazdelitev (ali pa kakšno drugo zvezno porazdelitev).
-
 \subsubsection{Sistematični del} 
 \textit{Sistematična komponenta} posplošenega linearnega modela poda relacije med pojasnjevalnimi spremenljivkami $x_{i,j}$. Te nastopajo 
 linearno, torej je sistematični del enak
 \[
 \beta_{0} + x_{i,1}\beta_{1} + x_{i,2}\beta_{2} + \ldots + x_{i,p}\beta_{p}
 \]
-
-
 \subsubsection{Povezovalna funkcija}
 Tretji del posplošenega linearnega modela je \textit{povezovalna funkcija}, ta nam poda funkcijo $g(\cdot)$ med slučajno komponento
 in sistematičnim delom. Če označimo $\mu = E(Y)$, je
@@ -167,25 +166,24 @@ in sistematičnim delom. Če označimo $\mu = E(Y)$, je
 \]
 Najenostavnejša taka funkcija je kar identiteta, torej $g(\mu) = \mu$. Ta nam torej da linearno povezavo med pojasnjevalnimi spremenljivkami 
 in pričakovano vrednostjo naših slučajnih spremenljivki. To je ena od oblik regresije za zvezne podatke.
-
 Mnogokrat pa linearna relacija ni primerna - fiksna sprememba pojasnjevalnih spremenljivk ima lahko večji vpliv, če je pričakovana vrednost 
 bližje 0, kot če je bližje 1. Recimo, da je $\pi$ verjetnost, da bo oseba kupila nov avto, ko je njen dohodek enak $x$. Sprememba v dohodku
 za 10.000\euro~ima manjši vpliv, če je dohodek 1.000.000\euro,~kot če je 50.000\euro.
-
 Takrat je smiselno uporabiti kakšno drugo povezovalno funkcijo, ki dopušča tudi nelinearne kombinacije pojasnjevalnih
 spremenljivk. Naprimer, $g(\mu) = \log(\mu)$ modelira
 pričakovano vrednost logaritma. Smiselno jo je uporabiti, če pričakovana vrednost ne more zavzeti negativnih vrednosti. Takemu modelu rečemo
 \textit{log-linearen} model.
-
 Spet druga povezovalna funkcija je $\mathrm{logit}(\mu) = \log(\frac{\mu}{1-\mu})$, ki nam modelira logaritem deležev - smiselno jo je uporabiti, 
 ko $\mu$ ne zavzame vrednosti izven $(0,1)$, torej ko imamo opravka z verjetnostmi. Takemu modelu rečemo logistični model.
-
 %\subsection{Primeri posplošenih linearnih modelov}
 \subsection{Točkovno ocenjevanje}
+Preden se natančneje posvetimo posplošenim linearnim modelom, si oglejmo dve najbolj znani metodi za ocenjevanje parametrov.
+
 \subsubsection{Metoda momentov}
+Metodo momentov Čebišev je leta 1887 predstavil v svojem dokazu centralnega limitnega izreka.
+
 \subsubsection{Metoda največjega verjetja}
 \subsection{Linearna regresija}
-
 Linearna regresija je najenostavnejši primer posplošenega linearnega modela. Enostavno jo lahko zapišemo kot:
 $
     Y = X \beta + \varepsilon
@@ -195,14 +193,10 @@ $\varepsilon$ pa slučajna spremenljivka, ki predstavlja napako - pri računanju
 $\mu = E(Y) = X\beta$. Model torej pričakovano vrednost slučajne spremenljivke predstavi kot linearno funkcijo pojasnjevalnih spremenljivk.
 Parametre $\beta$ ocenimo z metodo najmanjših kvadratov in ob predpostavki polnega ranga za matriko $X$ dobimo $\hat{\beta} =  (X^\top X)^{-1}
 X^\top Y$. 
-
-
 \subsection{Poissonova regresija}
-
 \subsection{Logistična regresija}
 Logistična regresija se uporablja za določanje deležev oziroma računanje verjetnosti. V poštev pride, ko imamo odgovore tipa uspeh-neuspeh oziroma
 govorimo o prisotnosti ali odsotnosti neke lastnosti.
-
 Spomnimo se Binomske porazdelitve $Y_{i} \sim B(n_{i}, p_{i})$. Ta pravi, da je 
 \[
     P(Y_{i} = y_{i}) = {n_{i} \choose y_{i}} p_{i}^{y_{i}}(1 - p_{i}) ^{n_{i} - y_{i}}
@@ -211,14 +205,12 @@ Pričakovana vrednost in varianca sta odvisni le od $p_{i}$, in sta enaki $E(Y_{
 Poglejmo si sedaj podrobneje \textit{logit} transformacijo. Če se spomnemo, želimo določiti verjetnost nekega dogodka pri danih podatkih. Ob uporabi
 identitente transformacije se nam kaj hitro lahko zgodi, da za posamezne verjetnosti dobimo vrednosti izven intervala $[0,1]$. Ta problem bomo rešili v 
 dveh korakih.
-
 Najprej uvedimo 
 \[ 
     \mathrm{delez}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
 \]
 kjer se premaknemo iz verjetnosti v \textit{deleže} -- verjetnost dogodka proti verjetnosti, da se ne bo zgodil. Če je $p_{i}$ enak $\frac{1}{2}$, 
 bo delež enak 1. Vidimo, da so deleži vedno pozitivni in niso omejeni navzgor.
-
 V naslednjem koraku pa poglejmo logaritem deležev ali logit verjetnosti
 \[
     \eta_{i} = \mathrm{logit}(p_{i}) = \log \frac{p_{i}}{1 - p_{i}}
@@ -228,18 +220,14 @@ strogo naraščajoča, torej imamo inverz. Običajno ga imenujemo \textit{antilo
 \[
     p_{i} = \mathrm{logit}^{-1}(\eta_{i}) = \frac{\exp{\eta_{i}}}{1+\exp{\eta_{i}}} = \frac{\exp{x_{i}^\top\beta}}{1+\exp{x_{i}^\top\beta}}
 \]
-
 Vse skupaj nam da \textit{logistični model}, ki za slučajni del vzame binomsko porazdelitev. %VPRAŠAJ KAJ JE Z NAPAKO
 Kot vidimo, zveza med prediktorji in verjetnostjo ni linearna, zato je težko oceniti, kako bo sprememba parametrov
 vplivala na verjetnost. Na to vprašanje lahko približno odgovorimo tako, da odvajamo po spremenljivki $x_{j}$ (kar ima seveda smisel le za zvezne
 pojasnjevalne spremenljivke) in dobimo $\nicefrac{\partial}{\partial x_{j}} = \beta_{j}p_{i}(1 - p_{i}).$~Vidimo, da na spremembo j-tega prediktorja
 vpliva tako verjetnost kot tudi parameter $\beta$. Običajno se za analizo vzame vzorčno povprečje verjetnosti opazovane vrednosti.
-
-
 \subsubsection{Ocenjevanje parametrov}\label{ocenpar}
 Imamo binomske slučajne spremenljivke in imamo povezovalno funkcijo, $\mathrm{}{logit p_{i}} = X\beta$, kjer so $\beta$ neznani parametri.
 V naslednjem razdelku si bomo ogledali kako zanje izpeljemo enačbe verjetja, ki jih nato uporabimo v numeričnih algoritmih.
-
 Kot v vsakem posplošenem linearnem modelu tudi v tem predpostavimo neodvisnost komponent slučajnega vektorja $\mathrm{Y}$ zato 
 \begin{align*}
     P(Y = \vec{y}) &= \prod_{i=1}^{n} P(Y_{i} = y_{i}) \\
@@ -252,7 +240,6 @@ končen rezultat nima vpliva. Po prejšnjih oznakah je torej
         &= \sum_{i=1}^{n}\{y_{i}\log{p_{i}} + (n_{i} - y_{i})\log(1 - p_{i})\} \nonumber \\
         &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\}
 \end{align}
-
 Po predpostavki logističnega modela je 
 \[
    \mathrm{logit}(p_{i}) = \log\left( \frac{p_{i}}{1-p_{i}}  \right) = \beta_{0} + x_{i1}\beta_{1} + \ldots + x_{ir}\beta_{r} = x_{i}^\top \beta,
@@ -262,14 +249,41 @@ iz česar lahko izrazimo verjetnost $p_{i}$
     p_{i} &= \frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}} \text{~ter} \\
     1 - p_{i} &= \frac{1}{1 + \exp{x_{i}^\top\beta}}
 \end{align}
-Če zgornje upoštevamo v logaritemski funkciji verjetja dobimo
+
+\pagebreak
+Zgornji funkciji rečemo \textit{sigmoida}. Iz njenega grafa je morda še bolj očitno, zakaj jo je smiselno uporabiti za modeliranje verjetnosti
+\begin{center}
+\begin{figure}[h]
+\begin{tikzpicture}
+    \begin{axis}[
+        axis lines = center,
+        %xtick = {-10,-9,-8,...,9,10}
+        ytick = {0,0.1,0.2,...,0.9,1},
+        ylabel = verjetnost,
+        y label style = {at={(axis description cs:0.25,.5)},rotate=90}%,anchor=south}
+    ]
+    \addplot [
+        domain=-8:8, 
+        samples=100, 
+        color=black,
+        ]
+        {exp(x)/(1+exp(x))};
+    %\addlegendentry{$x^2 + 2x + 1$}
+    
+    \end{axis}
+\end{tikzpicture}
+\caption{Graf sigmoide}
+\label{fig:sigmoid}
+\end{figure}
+\end{center}
+
+Če izpeljane izraze za verjetnost upoštevamo v logaritemski funkciji verjetja dobimo
 \begin{align}
     \ell(\beta) &= \sum_{i=1}^{n}\left( n_{i}\log{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  + y_{i}\log{\left( \frac{\frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}}}{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  \right)} \right) \nonumber\\
                 &= \sum_{i=1}^{n}\left( y_{i}(x_{i}^\top\beta) - n_{i}\log(1 + \exp{x_{i}^\top\beta})           \right)
 \end{align}
 Od tod vidimo, da je naša funkcija verjetja zares odvisna le od parametrov $\beta$,~vse ostalo nam je poznano. Da torej poiščemo maksimum in s tem
 cenilko največjega verjetja, funkcijo odvajamo in zbirno funkcijo enačimo z 0
-
 \[
     \dot{\ell}(\beta) = \begin{bmatrix}
                                  \frac{\partial \ell(\beta)}{\partial \beta_{0}} \\
@@ -278,7 +292,6 @@ cenilko največjega verjetja, funkcijo odvajamo in zbirno funkcijo enačimo z 0
                                  \frac{\partial \ell(\beta)}{\partial \beta_{p}}
                         \end{bmatrix}
 \]
-
 Pomembno je opaziti, da parametri $\beta$ vedno nastopajo ob pojasnjevalnih spremenljivkah linearno -- zato bodo komponente zbirne funkcije simetrične.
 J-ta komponenta bo tako enaka
 \begin{align}
@@ -289,7 +302,6 @@ J-ta komponenta bo tako enaka
     &= \frac{\exp(x_{i}^\top\beta)}{1 + \exp(x_{i}^\top\beta)} \frac{\partial}{\partial \beta_{j}} (x_{i}^\top\beta) \nonumber \\
     &=p_{i}(\beta)x_{ij}
 \end{align}
-
 Enačbe, ki jih s tem postopkom dobimo, v splošnem niso eksplicitno rešljive. Za reševanje se uporablja numerične metode, ki pa slonijo na Newtonovi iteraciji.
 Zanjo pa je potrebno izračunati še drugi odvod, zato to storimo tu. Zopet odvajamo po komponentah, tako kot zgoraj. Najprej izračunajmo
 \begin{align}
@@ -300,12 +312,10 @@ Vse sedaj skupaj sestavimo v
 \begin{align}
     \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} = - \sum_{i}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right),~~j,k = 0,1,\ldots, r
 \end{align}
-
 Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $var(Y_{i}) = v_{i}(\beta) = n_{i}p_{i}(1-p_{i}),$~kar vključimo v zgornjo enačbo in končno dobimo
 \begin{align}
     \ddot{\ell}(\beta) = -\sum_{i=1}^{n}\left(x_{ij}x_{ik}v_{i}(\beta)\right).
 \end{align}
-
 Zapišimo zgoraj izpeljane zveze v berljivejšo matrično notacijo. 
 \begin{equation*}
     \log \left(\frac{p}{1-p}\right) = \mathbf{X}\beta
@@ -316,7 +326,6 @@ Vektorsko definiramu tudi
                             \exp{x_{1}^\top\beta} \\
                             \vdots\\
                             \exp{x_{n}^\top\beta}
-
                             \end{bmatrix},
 \]
 spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo
@@ -329,7 +338,6 @@ in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
     \dot{\ell}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
 \end{align}
 kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
-
 S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komponent in torej lahko zapišemo
 \begin{equation}
     \mathrm{E}(Y) = m \circ p(\beta) \equiv \mu(\beta),
@@ -338,7 +346,6 @@ in lahko končno vse povzamemo v
 \begin{align}\label{prvi}
     \dot{\ell}(\beta) = \mathbf{X}^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
 \end{align}
-
 Ostane nam le še dvojni odvod. Najprej si oglejmo
 \[
     v(\beta) = \begin{bmatrix}
@@ -353,12 +360,23 @@ iz tega potem takoj sledi, da je
     \ddot{\ell}(\beta) = -\mathbf{X}^\top v(\beta)\mathbf{X},
 \end{equation}
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
+
 \subsection{Probit regresija}
+Probit regresija se uporablja v podobne namene kot logistična, torej za določanje verjetnosti in razvrščanje. Razvili so jo v tridesetih letih
+dvajsetega stoletja, ime pa je skovanka -- pride iz anglešlih besed \textit{\textbf{prob}ability un\textbf{it}}. V glavnem se od logistične regresije
+razlikuje v sistematičnem delu. Verjetnost pozitivnega izida torej po modelu predpostavljamo
+\begin{equation}
+    p_{i}(\beta) = \Phi (\beta_{0} + x_{i1}\beta_{1} + \ldots + x_{ir}\beta_{r}),
+\end{equation}
+kjer $\Phi$ predstavlja kumulativno porazdelitveno funkcijo standardne normalne slučajne spremenljivke. Ta seveda ni linearna, ne znamo je niti zapisati z 
+elementarnimi funkcijami. Podobno kot v logističnem modelu, se bomo ocenjevanja parametrov lotili po metodi največjega verjetja.
+
+\subsubsection{Ocenjevanje parametrov probit regresije}
+
 
 \section{Numerične metode}
 V sledečih razdelkih si bomo od bliže pogledali nekaj numeričnih metod, uporabljenih v kasnejših zgledih. Te metode slonijo na stoletja starih
 idejah, ki smo jih spoznali tekom študija, uporabljajo pa se tudi v številnih praktičnih aplikacijah.
-
 \subsection{Newton -- Raphsonova metoda} \label{nr}
 Newton -- Raphson (oziroma le Newtonova) metoda je bila v osnovi razvita za iskanje ničel funkcije. V najosnovnejši (ter najpogostejši) verziji za iskanje
 ničle funkcije ene spremenljivke začnemo v neki točki, naslendnjo pa izberemo v presčišču tangente, izračunane v 
@@ -373,18 +391,15 @@ Presečišče najdemo, če zgornjo enačbo enačimo z 0 in dobimo znano formulo
     x_{n+1} = x_{n} - \frac{f(x_{n})}{f'(x_{n})}.
 \]
 Metoda bo skonvergirala za začetne približke dovolj blizu ničli in v neki okolici ničle konvergirala s kvadratično hitrostjo. 
-
 Na težave naletimo v več primerih. Najprej, blizu stacionarne točke metoda odpove, saj bi delili z 0 (oziroma vrednostmi blizu ničle, kar je numerično nestabilno).
 Problem lahko predstavlja tudi računanje odvoda, ki zna biti zahtevno, ter dejstvo, da za slabe začetne približke ničle morda ne bomo našli. S temi 
 težavami se bomo soočili v nadaljevanju.
-
 Imamo torej algoritem, ki najde ničlo, v luči iskanja cenilke največjega verjetja pa bi želeli algoritem, ki poišče maksimum oziroma minimum funkcije.
 Recimo, da imamo neko logaritemsko funkcijo verjetja $L$, in trenutni približek $\theta_{n}$. Razvijmo funkcijo okoli približka v Taylorjev polinom
 druge stopnje:
 \begin{align}
     L(\theta) \approx L(\theta_{n}) + dL(\theta_{n})(\theta - \theta_{n}) + \frac{1}{2}(\theta - \theta_{n})^\top d^{2}L(\theta_{n})(\theta - \theta_{n}) \label{taylor}   
 \end{align}
-
 Maksimizirati želimo desno stran \eqref{taylor}. To storimo tako, da gradient $L$ enačimo z nič:
 \[
     \nabla L(\theta_{n}) + \nabla^2L(\theta_{n})(\theta - \theta_{n}) = 0  
@@ -393,23 +408,19 @@ in izrazimo naslednji približek
 \[
     \theta_{n + 1} = \theta_{n} - \nabla^{2}L(\theta_{n})^{-1}\nabla L(\theta_{n}).
 \]
-
 S tem postopkom imamo lahko dva problema. Prvič, lahko je zahtevno računati in invertirati drugi odvod (Hesian) funkcije, morda za kakšen $\theta_{n}$ sploh ne obstaja.
 Drugič, proč od $\hat{\theta}$ lahko Newtonova metoda napreduje navzgor ali navzdol -- oboje je enako verjetno. Z drugimi besedami, Newtonova metoda ni naraščajoč algoritem in torej
 ne da $L(\theta_{n}) < L(\theta_{n+1}).$ Mi pa bi želeli algoritem, ki bo konvergiral globalno (in ne le na nekem intervalu okoli rešitve).
-
 Težavo z računanjem inverza rešimo tako, da namesto invertiranja problem prevedemo na reševanje sistema enačb za premik:
 \begin{align}\label{newtoneq}
     x_{n + 1} &= x_{n} + p_{n} \nonumber\\
     \nabla^2L(\theta_{n})p_{n} &= -\nabla L(\theta_{n})
 \end{align}
 Zadnji vrstici v \eqref{newtoneq} rečemo tudi \textit{Newtonova enačba}.
-
 Radi bi še dosegli, da bi se Newtonov algoritem premikal v eno smer, torej naraščal ali padal. S tem bi vedeli, kaj se bo zgodilo v iteraciji in lažje predvideli morebitne
 nevšečnosti. Newtonova metoda za iskanje minimuma (maksimum) funkcije je optimizacijski problem drugega reda in realna funkcija ima globalni minimum (maksimum) tam, kjer je
 njen drugi odvod pozitiven, oziroma v primeru funkcij več spremenljivk, kjer je njen Hesian pozitivno definiten (in je tam gradient enak nič). Če bi torej imeli
 strogo pozivino definitno matriko, bi bil ta optimizacijski problem konveksen in kot tak rešljiv globalno (veljati morajo še pogoji Karush-Kuhn-Tuckerja, vendar je to skoraj vedno res).
-
 Imejmo torej v točki $x^{*}$ pozitivno definitno Hessejevo matriko $H.$~Zapišimo Taylorjev polinom druge stopnje okoli te točke
 \[
     f(x^{*} + s) = f(x_x^{*}) + \nabla f(x^{*})s + \frac{1}{2}s^\top H(x^{*})s.
@@ -420,11 +431,9 @@ Imejmo torej v točki $x^{*}$ pozitivno definitno Hessejevo matriko $H.$~Zapiši
 \]
 kar pomeni, da se vrednost funkcije vedno poveča, če se premaknemo iz stacionarne točke $x^{*}$~(drugi člen je vedno pozitiven zaradi pozitivne definitnosti)
 Tako vidimo, da imamo strogo padajoč algoritem.
-
 \subsection{Fisher's scoring}
 Fisher's scoring algoritem je variacija v prejšnjem razdelku opisanega Newton -- Raphsonovega algoritma, ki se v statistiki uporablja za numerično reševanje enačb največjega 
 verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških statistikov dvajsetega stoletja.
-
 Uvedimo najprej nekaj terminologije in oznak. Kot v prejšnjih poglavijh, imamo veliko opravka logaritemsko funckijo verjetja (angl. \textit{log-likelihood function}), ki jo tu označimo 
 z $L = \log \left(f(x_{1},\theta)\ldots f(x_{n},\theta) \right),$ ki jo obravnavamo kot funkcijo parametra $\theta$ pri fiksnem vzorcu. Po drugi strani pa je to
 tudi transformacija porazdelitvene funkcije slučajnega vektorja $X = (X_{1},X_{2},\ldots,X_{n}),$ kjer privzamemo neodvisnost komponent (kar pa seveda velja v vseh
@@ -433,15 +442,12 @@ Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher)
 \[
     I(\theta) = \mathrm{E}[\nabla L(\theta) \nabla L(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
 \]
-
 Fisher scoring algoritem sedaj je po zgornjih oznakah 
 \begin{align}
     \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\nabla L(\theta)
 \end{align}
-
 \subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
 V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikazali njegovo glavno prednost pred običajno Newtonovo iteracijo, opisano v poglavju \ref{nr}.
-
 Ob določenih predpostavkah o gladkosti logaritemske funkcije verjetja (ki za eksponentno družino vedno držijo), bomo sedaj pokazali, da je pričakovana vrednost
 zbirne funkcije enaka nič. Tu smo $\ell(\theta)$ označili z $\log f_{\theta}(x)$.
 \begin{align} \label{Ezbirne}
@@ -449,7 +455,6 @@ zbirne funkcije enaka nič. Tu smo $\ell(\theta)$ označili z $\log f_{\theta}(x
         &= \int \nabla f_{\theta}(x) \,dx \overset{*}{=} \nabla \int f_{\theta}(x) \,dx = \nabla 1 = 0, 
 \end{align}
 kjer smo v enakosti $(*)$ zamenjali integracijo in odvajanje, kar po teoriji mere smemo - gostota porazdelitev eksponentne družine je zvezno odvedljiva. 
-
 Velja tudi
 \[
     \nabla^{2} \log{f_{\theta}(x)} = \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \frac{\nabla f_{\theta}(x) \nabla f_{\theta}(x)^\top }{f_{\theta}(x)^{2}} = 
@@ -465,7 +470,6 @@ Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
     &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \nabla^2 \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
 \end{align}
 Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
-
 Kot smo videli v prejšnjih poglavjih, želimo imeti pozitivno semi-definitno matriko in s tem monoton algoritem. Izkaže se, da je informacijska matrika ravno variančno-kovariančna matrika
 zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vrednost zbirne funckije enaka 0. Potem takoj sledi
 \begin{align}
@@ -474,7 +478,6 @@ zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vred
     &= \mathrm{Var}[\nabla L(\theta)].
 \end{align}
 Variančno-kovariančne matrike pa so pozitivno semi-definitne.
-
 \subsubsection{Fisher's scoring v logističnem modelu}
 Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
 \[
@@ -486,32 +489,25 @@ res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. 
     \hat{\theta}_{i+1} &= \hat{\theta}_{i} - (\nabla^{2} L(\hat{\theta}_{i}))^{-1} \nabla L(\hat{\theta}_{i}) \nonumber \\
     &= \hat{\theta}_{i} + (\mathbf{X}^\top v(\hat{\theta}_{i}) \mathbf{X})^{-1}\mathbf{X}^\top(y - \mu(\hat{\theta}_{i})) 
 \end{align}
-
-
 \section{Primeri}
 \subsection{Ocenjevanje parametrov v logističnem modelu}
-\subsection{Ocenjevanje parametrov v probit modelu}
 
+V praktično usmerjenem delu te naloge smo v Pythonu implementirali zgoraj opisani postopek Fisher scoring algoritma za binomsko porazdeljene slučajne
+spremenljivke. Za delo v Pythonu smo uporabili več knjižnic\; \texttt{NumPy} za računanje z matrikami in vektorji, reševanje sistemov enačb ter invertiranje,
+knjižnico \texttt{pandas} za uvoz podatkov in njihovo začetno urejanje. Na koncu smo si s paketom \texttt{Pyplot} iz knjižnice \texttt{Matplotlib} rezultate izrisali.
+V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu nebomo ponovno navajali.
+\subsection{Ocenjevanje parametrov v probit modelu}
 % slovar
 \section*{Slovar strokovnih izrazov}
-
 %\geslo{}{}
 %
 %\geslo{}{}
 %
-
-
 % seznam uporabljene literature
 %\begin{thebibliography}{99}
-
 %\bibitem{}
-
 %end{thebibliography}
-
 \nocite{*}
 \bibliographystyle{plain}
 \bibliography{literatura}
-
-
 \end{document}
-

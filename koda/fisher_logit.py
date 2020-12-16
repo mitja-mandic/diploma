@@ -13,7 +13,6 @@ def varianca(vektor, skupine):
 def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin = [], zacetni_beta = [], epsilon=0.001):
     
     """
-    
     logistični model predpostavlja: logit(pi) = 1*beta_0 + x_i1*beta_1 + ... + x_ir*beta_r
     
     X je matrika teh koeficientov dimenzije: (n, r+1)
@@ -74,7 +73,7 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
     while True:
         if iteracije - 1 > max_iteracij:
             return print('presegli ste stevilo iteracij')
-        if all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
+        elif all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
             break
         else:
             p = p_i(np.matmul(matrika, beta_nov)) # n * (r+1) operacij
