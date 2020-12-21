@@ -178,11 +178,58 @@ ko $\mu$ ne zavzame vrednosti izven $(0,1)$, torej ko imamo opravka z verjetnost
 %\subsection{Primeri posplošenih linearnih modelov}
 \subsection{Točkovno ocenjevanje}
 Preden se natančneje posvetimo posplošenim linearnim modelom, si oglejmo dve najbolj znani metodi za ocenjevanje parametrov.
+Najprej si definirajmo nekaj pojmov, ki jih bomo uporabljali v nadaljnjih poglavjih.
+
+\textit{Cenilka} za realnoštevilsko karatkreristiko $c$ proučevane porazdelitve je funkcija vzorca $T=T(X_{1},\ldots,X_{n})$, s katero ocenjujemo $c.$
+Ta cenilka je \textit{nepristranska}, če za porazdelitev vzorca $F$ velja $E(T(X_{1},\ldots,X_{n})) = c(F).$
+Imejmo sedaj zaporedje cenilk za vzorce velikosti $n=1,2,\ldots.$ To zaporedje je \textit{dosledno}, če v verjetnosti konvergira h konstanti $c(F).$
+
+Če povzamem z drugimi besedami; nepristranska cenilka nam v povprečju vrne pravi rezultat, dosledna cenilka pa z večjim vzorcem vrne rezultat vedno
+bližje ocenjevani karakteristiki.
 
 \subsubsection{Metoda momentov}
-Metodo momentov Čebišev je leta 1887 predstavil v svojem dokazu centralnega limitnega izreka.
+Metodo momentov Čebišev je leta 1887 predstavil v svojem dokazu centralnega limitnega izreka. V splošnem ni tako uporabna kot spodaj opisana metoda največjega
+verjetja, je pa precej enostavna za računanje brez računalnika. Po besedah profesorja Smrekarja iz predavanj Verjetnosti in statistike\:
+,,metoda momentov sloni na filozofiji: vse kar se da izraziti z momenti, izrazimo z momenti.``
+
+V splošnem z metodo momentov postopamo takole: če je ocenjevano karakteristiko proučevane slučajne spremenljivke $c(X)$ mogoče izraziti kot funkcijo 
+momentov,t.j. če v danem modelu ti momenti obstajajo, 
+\[
+    c(X) = g(m_{1}(X), m_{2}(X),\ldots,m_{r}(X)),
+\] za neko funkcijo g, potem $c(X)$ ocenjujemo s cenilko $g(\hat{m}_{1},\ldots,\hat{m}_{r}).$ Če je g zvezna, dobimo dosledno cenilko.
 
 \subsubsection{Metoda največjega verjetja}
+Imejmo parametrični model s prostorom parametrov $\Theta$ in pripadajoč vektorski parameter $\theta = (\theta_{1},\ldots,\theta_{r}).$
+Privzemimo, da imajo vse proučevane porazdelitve gostote oziroma verjetnostne funkcije oblike
+\[
+    f(x;\theta) = f(x;\theta_{1},\ldots,\theta_{r}).
+\]
+Funkcijo verjetja za vzorec velikosti $n$ definiramo kot funkcijo paramtetra $\theta$, in sicer
+\[
+    \ell(X_{1},\ldots,X_{n};\underbrace{\theta_{1},\ldots,\theta_{r}}_{\theta}) = f(X_{1},\theta)\cdots f(X_{n},\theta).
+\]
+Kot funkcija vektorja $x$ pa je $\ell$ gostota slučajnega vektorja $X = (X_{1},\ldots,X_{n}).$
+
+Najti želimo tak parameter, v katerem bo funkcija verjetja zavzela svoj maksimum, torej 
+\[
+    \ell(\hat{\theta}) = \underset{\theta \in \Theta}{\max}\ell(\theta).
+\]
+Opazimo, da si računanje lahko precej poenostavimo, če obe strani zgornje enačbe logaritmiramo
+\begin{equation}
+    \log(\ell(\theta)) = L(\theta) = \sum_{i=1}^{n}\log f(x_{i},\theta),
+\end{equation}
+in funkciji $L$ rečemo logaritemska funkcija verjetja, njene stacionarne točke pa bodo kandidati za cenilko največjega verjetja. Ker je logaritem 
+naraščajoča funkcija, bodo ekstremi $L$ in $\ell$ sovpadali. Rešiti moramo torej sistem enačb
+\begin{equation}\label{mle}
+    \frac{\partial}{\partial_{j}}(L(\theta)) = 0~,j=1,\ldots,r,
+\end{equation}
+ki mu rečemo tudi sistem \textit{enačb verjetja}, odvod logaritemske funkcije verjetja pa v statistiki pogosto poimenujejo \textit{zbirna funkcija}.
+Ko rešimo enačbe verjetja, najdemo ekstrem funkcije verjetja in dobimo \textit{cenilko največjega verjetja}, v angleščini pogosto označeno MLE (okrajšava za
+\textit{maximum likelihood estimator}).
+
+Tako dobljene cenilke niso nujno nepristranske, so pa dosledne, če je rešitev \eqref{mle} enolična. V splošnem take enačbe niso rešljive eksplicitno, zato se poslužujemo različnih
+numeričnih metod za njihovo reševanje. Nekatere so predstavljene v drugem delu naloge.
+
 \subsection{Linearna regresija}
 Linearna regresija je najenostavnejši primer posplošenega linearnega modela. Enostavno jo lahko zapišemo kot:
 $
@@ -207,7 +254,7 @@ identitente transformacije se nam kaj hitro lahko zgodi, da za posamezne verjetn
 dveh korakih.
 Najprej uvedimo 
 \[ 
-    \mathrm{delez}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
+    \mathrm{dele"z}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
 \]
 kjer se premaknemo iz verjetnosti v \textit{deleže} -- verjetnost dogodka proti verjetnosti, da se ne bo zgodil. Če je $p_{i}$ enak $\frac{1}{2}$, 
 bo delež enak 1. Vidimo, da so deleži vedno pozitivni in niso omejeni navzgor.
