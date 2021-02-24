@@ -525,6 +525,48 @@ $f(x) = \sqrt[3]{x}.$ Izračunamo lahko
 in vidimo, da za vsak začetni približek različen od nič metoda divergira. Splošneje, podoben rezultat dobimo za vsako funkcijo oblike $f(x) = \lvert x \rvert^{\alpha}, 0 < \alpha < \frac{1}{2},$
 za $\alpha = \frac{1}{2}$ pa metoda sicer ne divergira, vendar se kot v prejšnjem primeru zacikla in ne pridemo do rešitve.
 
+V zgoraj naštetih primerih torej Newtonova metoda ne konvergira h iskani ničli. Smiselno pa sledi vprašanje, katerim pogojem mora biti zadoščeno, da pa 
+vednarle dobimo pravilno rešitev. To nam poda sledeči izrek:
+\begin{izrek} 
+    Naj iteracijska funkcija $g$ na intervalu $I = [ \alpha - \delta,\alpha + \delta ]$ zadošča Lipschitzovemu pogoju
+    \[
+        \lvert g(x) - g(y) \rvert \leq m \lvert x - y \rvert
+    \]
+    za poljubna $x,y \in I$ in konstanto 0 $\leq m \leq 1$. Potem za vsak $x_{0} \in I$ zaporedje $x_{r+1} = g(x_{r}), r \geq 1$ konvergira k $\alpha$. Poleg tega veljata
+    tudi oceni
+    \begin{equation}\label{prva_neenakost}
+        \lvert x_{r} - \alpha \rvert \leq m^{r}\lvert x_{0} - \alpha \rvert
+    \end{equation}
+    in
+    \begin{equation}
+        \lvert x_{r+1} - \alpha \rvert \leq \frac{m}{1-m} \lvert x_{r} - x_{r-1} \rvert
+    \end{equation}
+\end{izrek}
+\begin{proof}
+    Označimo z $\varepsilon_{r} = x_{r} - \alpha $ napako približka $x_{r}.$ Velja
+    \[
+        \lvert \varepsilon_{r} \rvert = \lvert x_{r} - \alpha \rvert = \lvert g(x_{r-1}) - g(\alpha) \rvert \leq m\lvert x_{r-1} - \alpha \rvert = m \varepsilon_{r-1}.
+    \]
+    Ta postopek nadaljujemo in sledi
+    \[
+        \lvert \varepsilon_{r} \rvert \leq m \lvert \varepsilon_{r-1} \rvert \leq m^{2} \lvert \varepsilon_{r-2} \rvert \leq \ldots \leq m^{r} \lvert\varepsilon_{0} \rvert
+    \]
+    Od tu vidimo \eqref{prva_neenakost}, iz katere sledi da zaporedje $x_{r}$ konvergira proti $\alpha.$
+
+    Za drugo neenakost pa si oglejmo
+    \[
+        \lvert x_{r+1} - \alpha \rvert \leq \lvert x_{r+1} - x_{r+2} \rvert + \lvert x_{r+2} - x_{r+3} \rvert + \ldots
+    \]
+    Upoštevamo še
+    \[
+        \lvert x_{r+k} - x_{r+k+1} \rvert = \lvert g(x_{r+k-1}) - g(x_{r+k}) \rvert \leq m \lvert x_{r+k-1} - x_{r+k} \rvert \leq \ldots \leq m^{k}v\lvert x_{r-1} - x_{r}\rvert 
+    \]
+    in končno dobimo
+    \[
+        \lvert x_{r+1} - \alpha\rvert \leq (m + m^2 + \cdots)\lvert x_{r-1} - x_{r}\rvert = \frac{m}{1-m}\lvert x_{r-1} - x_{r}\rvert
+    \]
+\end{proof}
+
 \subsubsection{Asimptotsko obnašanje in konvergenca}
 Kot je pri numeričnih metodah to običajno, nas zanima njihovo obnašanje po več ponovitvah iteriacije ter kam konvergirajo v odvisnosti od začetne točke. Načeloma želimo,
 da bo konvergenca metode kar najvišjega reda - da bomo v vsakem koraku pridobili kar se da veliko pravilnih decimalnih mest. 
