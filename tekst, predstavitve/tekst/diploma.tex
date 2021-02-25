@@ -450,7 +450,13 @@ torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}
 V sledečih razdelkih si bomo od bliže pogledali nekaj numeričnih metod, uporabljenih v kasnejših zgledih. Te metode slonijo na stoletja starih
 idejah, ki smo jih spoznali tekom študija, uporabljajo pa se tudi v številnih praktičnih aplikacijah.
 \subsection{Newton -- Raphsonova metoda} \label{nr}
-Newton -- Raphson (oziroma le Newtonova) metoda je bila v osnovi razvita za iskanje ničel funkcije. V najosnovnejši (ter najpogostejši) verziji za iskanje
+Newton -- Raphson (oziroma le Newtonova) metoda je bila v osnovi razvita za iskanje ničel funkcije. Spada v razred \textit{navadnih iteracij}, torej metod za iterativno
+reševanje enačb $f(x) = 0,$ ki jih prevedemo na $g(x) = x,$ izberemo začetni približek $x_{0}$ in ponavljamo 
+\[
+    x_{r+1} = g(x_{r}).
+\]
+
+V najosnovnejši (ter najpogostejši) verziji za iskanje
 ničle funkcije ene spremenljivke začnemo v neki točki, naslendnjo pa izberemo v presčišču tangente, izračunane v 
 tej točki, z x-osjo. Postopek tako iterativno nadaljujemo. Ideja je torej sila preprosta, za izpeljavo pa tudi ni potrebno preveč truda.
 Predpostavimo odvedljivost funkcije na nekem intervalu in recimo, da imamo trenuten približek $x_{n}.$~Razvijmo sedaj funkcijo v Taylorjev
@@ -567,14 +573,67 @@ vednarle dobimo pravilno rešitev. To nam poda sledeči izrek:
     \]
 \end{proof}
 
-\subsubsection{Asimptotsko obnašanje in konvergenca}
-Kot je pri numeričnih metodah to običajno, nas zanima njihovo obnašanje po več ponovitvah iteriacije ter kam konvergirajo v odvisnosti od začetne točke. Načeloma želimo,
-da bo konvergenca metode kar najvišjega reda - da bomo v vsakem koraku pridobili kar se da veliko pravilnih decimalnih mest. 
+Dodatno informacijo o območju konvergence navadne iteracije nam dajo tudi vrednosti odvoda iteracijske funkcije, o čemer govori naslednji izrek.
+\begin{izrek}
+    Naj bo iteracijska funkcija zvezno odvedljiva v negibni točki $\alpha$ in naj velja $\lvert g'(\alpha) \rvert < 1.$ Potem obstaja okolica I negibne točke,
+    da za vsak začetni približek $x_{0} \in I$ iteracija konvergira k $\alpha.$
+\end{izrek}
+\begin{proof}
+    Odvod je po predpostavki na neki okolici $\alpha$ strogo manjši od 1 in zaradi zveznosti obstajata $\delta > 0$ in konstanta $m < 1,$ da je $\lvert g'(x) \rvert < m < 1 za x \in I,$
+    kjer z $I$ označimo $[\alpha - \delta,\alpha + \delta ].$ Potem po Lagrangeovem izreku velja $\lvert g(x) - g(y) \rvert \leq \lvert g'(\xi) \rvert \dot \lvert x - y \rvert,$
+    za poljubna $x,y \in I.$ Ker je odvod na tem intervalu manjši od 1 sledi da je funkcija g Lipschitzova in zato po \eqref{prva_neenakost} konvergira.
+\end{proof}
 
-%\textit{Hitrost konvergence} numerične metode je $\mu$, če velja
-%\[
-%    \lim_{n \to \infty}  \frac{\lvert x_{n+1} - x^{*}\rvert}{(\lvert x_{n} - x^{*} \rvert)^{q}} = \mu
-%\]
+\subsubsection{Asimptotsko obnašanje in konvergenca}
+Kot je pri numeričnih metodah to običajno, nas zanima njihovo obnašanje po več ponovitvah iteriacije. Pomembno je, kako hitro pridemo do rešitve saj želimo računanje čim manjkrat
+ponoviti in dobiti najboljši možen rezultat.
+
+Definirajmo si \textit{red konvergence}. Idejno je to število točnih decimalnih mest, ki jih pridobimo z vsakim korakom iteracije. 
+\begin{definicija}\label{red_konv}
+    Naj zaporedje $(x_{r})$ konvergira k $\alpha.$ Red konvergence je enak p, če obstajata taki števili $C_{1}, C_{2},$ da velja
+    \[
+        C_{1}\lvert x_{r} - \alpha \rvert ^{p} \leq \lvert x_{r+1} - \alpha \rvert \leq C_{2} \lvert x_{r} - \alpha \rvert^{p}.
+    \]
+    Ekvivalentno: red konvergence je p, če obstaja $C > 0$ tak, da
+    \[
+        \lim_{r\to\infty} \frac{\lvert x_{r+1} - \alpha\rvert}{\lvert x_{r} - \alpha\rvert^{p}} = C.
+    \]
+\end{definicija}
+
+Red konvergence navadne iteracije je običajno precej enostavno določiti. Metodo nam daje naslenji izrek
+\begin{izrek}
+    Naj bo iteracijska funkcija g v okolici svoje fiksne točke p-krat zvezno odvedljiva in $\lvert g'(\alpha) \rvert \leq 1, g^{(k)}(\alpha) = 0 za k = 1,\ldots,p-1 \text{ in }
+    g^{p}(\alpha) \neq 0.$ Potem ima iterativna metoda lokalno red konvergence p.
+\end{izrek}
+\begin{proof}
+    Razvijmo $g$ v Taylorjevo vrsto okrog $\alpha$
+    \[
+        x_{r+1} = g(x_{r}) = \alpha + \frac{1}{p!}(x_{r} - \alpha)^{p}g^{(p)}(\xi),
+    \]
+    kjer $\xi$ leži med $x_{r}$ in $\alpha.$ Ocenimo odvod navzgor in navzdol ter s tem dobimo konstanti $C_{1},C_{2}$ iz \ref{red_konv}.
+\end{proof}
+
+Pa poskusimo sedaj določiti red konvergence Newtonove metode. Označimo
+\[
+    g(x) = x - \frac{f(x)}{f'(x)}.
+\]
+Odvajamo in dobimo
+\[
+    g'(x) = \frac{f(x)f''(x)}{f'^{2}(x)}.
+\]
+Vidimo, da je potrebno ločiti dva primera:
+\begin{itemize}
+    \item Če je $g'(\alpha) = 0,$ torej je $\alpha$ enostavna ničla je konvergenca vsaj kvadratična. Z nadaljnjim računom dobimo
+    \[
+        g''(\alpha) = \frac{f''(\alpha)}{f'(\alpha)},
+    \]
+    in vidimo, da je pri $f''(\alpha) \neq 0$ konvergenca kvadratična. Sicer postopek nadaljujemo, dokler ne najdemo prvega odvoda z vrednostjo v $\alpha$ 0.
+    \item Če je $\alpha$ m-kratna ničla pa se da pokazati
+    \[
+        \lim_{x\to\alpha} g'(x) = 1 - \frac{1}{m},
+    \]
+    od koder sledi linearna konvergenca.
+\end{itemize}
 
 
 
