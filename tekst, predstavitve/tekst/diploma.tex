@@ -130,7 +130,7 @@ V povzetku na kratko opi"si vsebinske rezultate dela. Sem ne sodi razlaga organi
 
 % tu se zacne besedilo seminarja
 \section{Uvod}
-Posplošeni linearni modeli so ključen del statistične analize. Pomagajo nam bolje razumeti relacije med rezultati meritev in s temi izsledki
+Posplošeni linearni modeli so ključen del statsistične analize. Pomagajo nam bolje razumeti relacije med rezultati meritev in s temi izsledki
 predvideti trende v prihodnosti. Modeli morajo biti kar se da enostavni, ampak hkrati zagotavljati določeno natančnost. Vsa teorija nam pa v praksi
 ne koristi, če konkretnih številk ne znamo izračunati.
 
@@ -138,6 +138,8 @@ V dobi ogromne množice podatkov je računska učinkovitost ključni del obdelav
 
 V delu bom najprej predstavil posplošene linearne modele in najpriljubljenejše numerične metode, ki se uporabljajo za njihovo obdelavo. 
 Teorijo bom osvetlil tudi s praktičnimi primeri.
+
+\section{Eksponentna družina} %mal razložim, predvsem da bom kasneje dokazal enakost N-R in F-S
 
 \section{Posplošeni linearni modeli}
 
@@ -241,35 +243,7 @@ $\mu = E(Y) = X\beta$. Model torej pričakovano vrednost slučajne spremenljivke
 Parametre $\beta$ ocenimo z metodo najmanjših kvadratov in ob predpostavki polnega ranga za matriko $X$ dobimo $\hat{\beta} =  (X^\top X)^{-1}
 X^\top y$, kjer smo do slednjega sistema enačb prišli preko pretvorbe na normalni sistem enačb. Ko rešimo ta sistem, dobimo zgoraj opisano cenilko največjega verjetja-
 
-\subsection{Poissonova regresija}
-
-\subsection{Probit regresija}
-Probit regresija se uporablja v podobne namene kot logistična, torej za določanje verjetnosti in razvrščanje. Razvili so jo v tridesetih letih
-dvajsetega stoletja, ime pa je skovanka -- pride iz anglešlih besed \textit{\textbf{prob}ability un\textbf{it}}. V glavnem se od logistične regresije
-razlikuje v sistematičnem delu. Verjetnost pozitivnega izida torej po modelu predpostavljamo
-\begin{equation}
-    p_{i}(\beta) = \Phi (\beta_{0} + x_{i1}\beta_{1} + \ldots + x_{ir}\beta_{r}),
-\end{equation}
-kjer $\Phi$ predstavlja kumulativno porazdelitveno funkcijo standardne normalne slučajne spremenljivke. Ta seveda ni linearna (v nasprotju s prejšnjimi modeli),
-podana je kot 
-\[
-    \Phi(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{x}e^{\frac{-t^2}{2}}\,dt
-\]
-Podobno kot v logističnem modelu, se bomo ocenjevanja parametrov lotili po metodi največjega verjetja. 
-
-Za sistematični del modela privzemimo binomsko porazdeljene slučajne spremenljivke s parametroma $B(m_{i},p_{i}(\beta))$,
-verjetnost pozitivnega izida pa izrazimo z
-\[
-    P(Y_{i} = y_{i}) = \binom{m_{i}}{y_{i}}p_{i}(\beta)^{y_{i}}(1 - p_{i}(\beta))^{m_{i} - y_{i}} = \binom{m_{i}}{y_{i}} (\Phi(x_{i}^\top \beta)^{y_{i}})(1 - \Phi(x_{i}^\top \beta))^{m_{i} - y_{i}} 
-\]
-Funkcijo verjetja, tako kot zgoraj izrazimo z gostotami posameznih komponent
-\[
-    \ell(\beta) = \prod_{i=1}^{n} \binom{m_{i}}{y_{i}} \Phi(x_{i}^\top\beta)^{y_{i}}(1 - \Phi(x_{i}^\top\beta))^{m_{i} - y_{i}},
-\]
-kjer binomski simbol izpustimo, zaradi enostavnejšega pisanja. Zgornjo enačbo logaritmiramo in dobimo
-\begin{equation}
-    \log(\ell(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
-\end{equation}
+%\subsection{Poissonova regresija}
 
 \subsection{Logistična regresija}
 Logistična regresija se uporablja za določanje deležev oziroma računanje verjetnosti. V poštev pride, ko imamo odgovore tipa uspeh-neuspeh oziroma
@@ -441,10 +415,59 @@ iz tega potem takoj sledi, da je
 \end{equation}
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 
+\subsection{Kanonični modeli v splošnem}
+Kot bomo spoznali v sledečem razdelku, spada logistična regresija med tako imenovane modele s "'kanonično"` povezovalno funkcijo. 
 
+\subsubsection{Kaj so kanonične povezovalne funkcije?}
+Kot smo omenili že v uvodu povezovalna funkcija opisuje relacijo med pričakovano vrednostjo opazovane spremenljivke in desno stranjo našega modela, torej
+sistematično komponento modela. Za vsako porazdelitev iz eksponentne družine, ki jo opazovani spremenljivki pripišemo, obstaja \textit{naravna} ali \textit{kanonična}
+povezovalna funkcija. V spodnji tabeli so prikazani primeri takih funkcij
 
+\begin{center}
+    \begin{tabular}{ | c | c | c |}
+        \hline
+        Porazdelitev & $f(\mu)$ & Uporaba \\
+        \hline
+        Normalna & $id(\mu)$ &  Linearni odgovori\\
+        Poissonova & $\log \mu$ & Število pojavitev \\
+        Binomska & $\mathrm{logit}\mu$ & Binarni podatki\\
+        Gamma & $-\frac{1}{\mu}$ & \\
+        \hline
+    \end{tabular}
+\end{center}
 
-%\subsubsection{Ocenjevanje parametrov probit regresije}
+\subsection{Probit regresija}
+Probit regresija se uporablja v podobne namene kot logistična, torej za določanje verjetnosti in razvrščanje. Razvili so jo v tridesetih letih
+dvajsetega stoletja, ime pa je skovanka -- pride iz angleških besed \textit{\textbf{prob}ability un\textbf{it}}. V glavnem se od logistične regresije
+razlikuje v sistematičnem delu. Verjetnost pozitivnega izida torej po modelu predpostavljamo
+\begin{equation}
+    p_{i}(\beta) = \Phi (\beta_{0} + x_{i1}\beta_{1} + \ldots + x_{ir}\beta_{r}),
+\end{equation}
+kjer $\Phi$ predstavlja kumulativno porazdelitveno funkcijo standardne normalne slučajne spremenljivke. Ta seveda ni linearna (v nasprotju s prejšnjimi modeli),
+podana je kot 
+\[
+    \Phi(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{x}e^{\frac{-t^2}{2}}\,dt
+\]
+
+\subsubsection{Ocenjevanje parametrov probit regresije}
+Podobno kot v logističnem modelu, se bomo ocenjevanja parametrov lotili po metodi največjega verjetja. 
+
+Za sistematični del modela privzemimo binomsko porazdeljene slučajne spremenljivke s parametroma $B(m_{i},p_{i}(\beta))$,
+verjetnost pozitivnega izida pa izrazimo z
+\[
+    P(Y_{i} = y_{i}) = \binom{m_{i}}{y_{i}}p_{i}(\beta)^{y_{i}}(1 - p_{i}(\beta))^{m_{i} - y_{i}} = \binom{m_{i}}{y_{i}} (\Phi(x_{i}^\top \beta)^{y_{i}})(1 - \Phi(x_{i}^\top \beta))^{m_{i} - y_{i}} 
+\]
+Funkcijo verjetja, tako kot zgoraj izrazimo z gostotami posameznih komponent
+\[
+    \ell(\beta) = \prod_{i=1}^{n} \binom{m_{i}}{y_{i}} \Phi(x_{i}^\top\beta)^{y_{i}}(1 - \Phi(x_{i}^\top\beta))^{m_{i} - y_{i}},
+\]
+kjer binomski simbol izpustimo zaradi enostavnejšega pisanja. Zgornjo enačbo logaritmiramo in dobimo
+\begin{equation}
+    \log(\ell(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
+\end{equation}
+Enačbo zopet odvajamo po parametru $\beta,$ vendar se nam v tem primeru ne poenostavi kot z logistično funkcijo.
+
+\subsection{Ne-kanonični modeli v splošnem}
 
 \section{Numerične metode}
 V sledečih razdelkih si bomo od bliže pogledali nekaj numeričnih metod, uporabljenih v kasnejših zgledih. Te metode slonijo na stoletja starih
@@ -635,8 +658,6 @@ Vidimo, da je potrebno ločiti dva primera:
     od koder sledi linearna konvergenca.
 \end{itemize}
 
-
-
 \subsection{Fisher's scoring}
 Fisher's scoring algoritem je variacija v prejšnjem razdelku opisanega Newton -- Raphsonovega algoritma, ki se v statistiki uporablja za numerično reševanje enačb največjega 
 verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških statistikov dvajsetega stoletja.
@@ -682,6 +703,12 @@ zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vred
     &= \mathrm{Var}[\nabla L(\theta)].
 \end{align}
 Variančno-kovariančne matrike pa so pozitivno semi-definitne.
+
+\subsubsection{Ujemanje Newton-Raphson in Fisher's scoring za kanonične povezovalne funkcije}
+Kot si bomo v naslednjem razdelku natančneje pogledali za logistični model, Newton-Raphsonova metoda sovpada s Fisher's scoring za vse modele s kanonično povezovalno funkcijo.
+
+
+
 \subsubsection{Fisher's scoring v logističnem modelu}
 Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
 \[
@@ -700,7 +727,14 @@ V praktično usmerjenem delu te naloge smo v Pythonu implementirali zgoraj opisa
 spremenljivke. Za delo v Pythonu smo uporabili več knjižnic\; \texttt{NumPy} za računanje z matrikami in vektorji, reševanje sistemov enačb ter invertiranje,
 knjižnico \texttt{pandas} za uvoz podatkov in njihovo začetno urejanje. Na koncu smo si s paketom \texttt{Pyplot} iz knjižnice \texttt{Matplotlib} rezultate izrisali.
 V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu nebomo ponovno navajali.
+\subsubsection{Algoritem za logistični model}
+
 \subsection{Ocenjevanje parametrov v probit modelu}
+
+\subsubsection{Algoritem za probit model}
+
+
+
 % slovar
 \section*{Slovar strokovnih izrazov}
 %\geslo{}{}
