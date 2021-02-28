@@ -140,6 +140,56 @@ V delu bom najprej predstavil posplošene linearne modele in najpriljubljenejše
 Teorijo bom osvetlil tudi s praktičnimi primeri.
 
 \section{Eksponentna družina} %mal razložim, predvsem da bom kasneje dokazal enakost N-R in F-S
+Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
+pri posploševanju rezultatov. Slučajni vektor $Y$ torej pripada \textit{enoparametrični eksponentni družini,} če je njegova gostota oblike 
+\begin{equation}
+    f_{Y}(y; \theta, \phi) = \exp{\{\frac{A(y\cdot\theta - \gamma(\theta))}{\phi} + \tau(y, \frac{\phi}{A})\}},
+\end{equation}
+za vektorski parameter $\theta,$ ki ga pogosto imenujemo \textit{kanonični} ali \textit{naravni} parameter, disperzijski parameter $\phi$, utež $A,$
+ter dani funkciji $\gamma, \tau.$ 
+
+Koristno je tudi pogledati logaritem zgornje enačbe
+\begin{align}
+    \ell(\theta) &= \log f_{Y}(y; \theta, \phi) = A\frac{y\cdot\theta - \gamma{\theta}}{\phi} + \tau(y,\frac{\phi}{A}) \\
+    \frac{\partial}{\partial \theta}\ell &= \frac{A}{\phi}(y - \gamma'(\theta))
+\end{align}
+Izkaže se, da za slučajne vektorje z gostoto iz eksponentne družine veljata naslednji zvezi %še nevem če bom dokazoval. VPRAŠAJ SMREKIJA
+\begin{equation}\label{izp}    
+    \mathbb{E}(Y) = \mu = \gamma'(\theta), \mathrm{Var}(Y) = \frac{\phi}{A}\gamma''(\theta)
+\end{equation}
+
+Poleg formul za izračun variance in pričakovane vrednosti nam zgornji rezultat pove še, da je za porazdelitve eksponentne družine varianca funkcija pričakovane vrednosti.
+
+Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine.
+\begin{itemize}
+    \item \textbf{Normalna porazdelitev.} Normalno porazdeljena slučajna spremenljivka $Y \sim N(\mu, \sigma^2)$
+    ima gostoto $f_{Y}(y) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left(-\frac{(y-\mu)^2}{2\sigma^2}\right)}.$
+    Če zgornjo enačbo logaritmiramo dobimo
+    \begin{align*}
+        \ell(\mu, \sigma; y) &= \log\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right) -\frac{(y-\mu)^2}{2\sigma^2} = -\frac{1}{2}\log(2\sigma^2\pi) - \frac{y^2 - 2\mu y + \mu^2}{2 \sigma^2}    \\ \nonumber
+                            &= \frac{y\mu-\nicefrac{\mu^2}{2}}{\sigma^2} - \frac{1}{2}\left(\frac{y^2}{\sigma^2} + \log(2\pi\sigma^2)\right) 
+    \end{align*}
+    Od tu preberemo zgoraj definirane vrednosti
+    \[
+        \theta = \mu,~\phi = \sigma^2,~\gamma(\theta) = \frac{\theta^2}{2},~A = 1,
+    \]
+    in takoj sledijo zaključki
+    \[
+        \mathbb{E}(Y) = \gamma'(\theta) = \mu \text{ in } \mathrm{Var}(Y) = \frac{\phi}{A}\gamma''(\theta) = \sigma^2,
+    \]
+    kar se ujema z enačbami \refeq{izp}.
+
+    \item \textbf{Binomska porazdelitev.} Imejmo binomsko porazdeljen slučajni vektor $Y \sim \mathrm{Bin}(n,p).$ Verjetnost 
+    \[
+        \mathrm{P}(Y = y) = \binom{n}{y}p^y(1-p)^{n-y} = \exp\left(y\log(\frac{p}{1-p}) + n\log(1-p) + \log{\binom{n}{k}}\right),
+    \]
+    od koder direktno sledi
+    \[
+        \theta = \log\frac{p}{1-p},~\gamma(\theta) = n\log(1 + e^{\theta}),~\phi = 1,
+    \]
+    in opazimo da je tokrat naravni parameter $\log\frac{1}{1-p},$ kar imenujemo tudi \textit{logit} verjetnosti. Pomembnost tega rezultata 
+    bomo videli v naslednjih poglavjih.
+\end{itemize}
 
 \section{Posplošeni linearni modeli}
 
