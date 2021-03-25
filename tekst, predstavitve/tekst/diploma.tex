@@ -24,6 +24,8 @@
 \usepackage{mathtools}
 \usepackage{tikz}
 \usepackage{pgfplots}
+\usepackage[ruled,vlined]{algorithm2e}
+%\usepackage{float}
 % ne spreminjaj podatkov, ki vplivajo na obliko strani
 \textwidth 15cm
 \textheight 24cm
@@ -143,7 +145,7 @@ Teorijo bom osvetlil tudi s praktičnimi primeri.
 Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
 pri posploševanju rezultatov. Slučajni vektor $Y$ torej pripada \textit{enoparametrični eksponentni družini,} če je njegova gostota oblike 
 \begin{equation}
-    f_{Y}(y; \theta, \phi) = \exp{\{\frac{A(y\cdot\theta - \gamma(\theta))}{\phi} + \tau(y, \frac{\phi}{A})\}},
+    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{A(y\cdot\theta - \gamma(\theta))}{\phi} + \tau(y, \frac{\phi}{A})\right)},
 \end{equation}
 za vektorski parameter $\theta,$ ki ga pogosto imenujemo \textit{kanonični} ali \textit{naravni} parameter, disperzijski parameter $\phi$, utež $A,$
 ter dani funkciji $\gamma, \tau.$ 
@@ -160,7 +162,7 @@ Izkaže se, da za slučajne vektorje z gostoto iz eksponentne družine veljata n
 
 Poleg formul za izračun variance in pričakovane vrednosti nam zgornji rezultat pove še, da je za porazdelitve eksponentne družine varianca funkcija pričakovane vrednosti.
 
-Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine.
+Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
 \begin{itemize}
     \item \textbf{Normalna porazdelitev.} Normalno porazdeljena slučajna spremenljivka $Y \sim N(\mu, \sigma^2)$
     ima gostoto $f_{Y}(y) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left(-\frac{(y-\mu)^2}{2\sigma^2}\right)}.$
@@ -742,7 +744,7 @@ kjer smo v zadnji enakosti upoštevali
 Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
 \begin{align}\label{infoeq}
     I(\theta) &= \mathrm{E}[\nabla L(\theta)(\nabla L(\theta))^\top] =  -\int f_{\theta}(x) \nabla^2 \log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
-    &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \nabla^2 \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
+    &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
 \end{align}
 Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
 Kot smo videli v prejšnjih poglavjih, želimo imeti pozitivno semi-definitno matriko in s tem monoton algoritem. Izkaže se, da je informacijska matrika ravno variančno-kovariančna matrika
@@ -773,11 +775,45 @@ res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. 
 \section{Primeri}
 \subsection{Ocenjevanje parametrov v logističnem modelu}
 
-V praktično usmerjenem delu te naloge smo v Pythonu implementirali zgoraj opisani postopek Fisher scoring algoritma za binomsko porazdeljene slučajne
+V praktično usmerjenem delu naloge smo v Pythonu implementirali zgoraj opisani postopek Fisher scoring algoritma za binomsko porazdeljene slučajne
 spremenljivke. Za delo v Pythonu smo uporabili več knjižnic\; \texttt{NumPy} za računanje z matrikami in vektorji, reševanje sistemov enačb ter invertiranje,
 knjižnico \texttt{pandas} za uvoz podatkov in njihovo začetno urejanje. Na koncu smo si s paketom \texttt{Pyplot} iz knjižnice \texttt{Matplotlib} rezultate izrisali.
 V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu nebomo ponovno navajali.
+
 \subsubsection{Algoritem za logistični model}
+
+\begin{algorithm}[h]
+    \caption{oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
+    \SetAlgoLined
+    %\KwResult{Write here the result }
+    Nastavimo začetne vrednosti\;
+    $p = \frac{\exp{(X^\top \beta_{star})}}{1 + \exp{(X^\top \beta_{star})}}$ \;
+    $V = p(1 - p)$ \;
+    $zacetniScore = X^\top (Y - p)$ \;
+    $zacetniInfo = X^\top V X$ \;
+    
+    Reši sistem na h: $zacetniInfo * h = zacetniScore$ \;
+    $\beta_{star} = \beta_{zacetni}$
+    $\beta_{nov} = \beta_{star} + h$ \;
+    \While{$i \leq \text{iteracije}$}{
+        %instructions\;
+        \eIf{$\beta_{nov} - \beta_{star} \geq \epsilon$}{
+            $p = \frac{\exp{(X^\top \beta_{nov})}}{1 + \exp{(X^\top \beta_{nov})}}$ \;
+            $V = p(1 - p)$ \;
+            $Score = X^\top (Y - p)$ \;
+            $Info = X^\top V X$ \;
+            Razreši na h: 
+            $Info * h = Score$ \;
+            $\beta_{star} = \beta_{nov}$ \;
+            $\beta_{nov} = \beta_{star} + h$ \;
+        %instructions2\;
+        }{
+        Dosegli smo želeno natančnost v zadostnem številu korakov\;
+        \Return{$\beta_{nov}$}
+        }
+    }
+\end{algorithm}
+
 
 \subsection{Ocenjevanje parametrov v probit modelu}
 

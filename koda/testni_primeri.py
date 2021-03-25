@@ -9,7 +9,7 @@ cur_path = os.path.dirname(__file__)
 new_path = os.path.relpath('..\\podatki\\podatki.txt', cur_path)
 
 
-podatki = pd.read_csv('koda\\podatki.txt')
+podatki = pd.read_csv("diploma\\koda\\podatki.txt")
 podatki['dodatna'] = 1
 matrika = podatki[['dodatna','TEMPERATURE']].values
 vrednosti_y = podatki[['O_RING_FAILURE']].values

@@ -41,11 +41,11 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
     
     vektor_rezultatov = np.reshape(vektor_rezultatov, (n,))
 
-    zacetni_beta = np.array(np.zeros(np.shape(matrika)[1]))
+    #zacetni_beta = np.array(np.zeros(np.shape(matrika)[1]))
     #print(np.shape(zacetni_beta))
 
     zacetni_p = np.array(p_i(np.matmul(matrika, zacetni_beta)))
-    #print(zacetni_p)
+    print(np.shape(zacetni_p), "zacetni p")
     zacetna_varianca = varianca(zacetni_p, vektor_skupin)
     
     print(np.shape(zacetna_varianca))
@@ -73,12 +73,13 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
     while True:
         if iteracije - 1 > max_iteracij:
             return print('presegli ste stevilo iteracij')
+        #elif all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
         elif all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
             break
         else:
             p = p_i(np.matmul(matrika, beta_nov)) # n * (r+1) operacij
             var = varianca(p, vektor_skupin)
-            print(np.shape(matrika), np.shape(var))
+            #print(np.shape(matrika), np.shape(var))
             #print(np.shape(var))
             info = np.matmul(np.matmul(np.transpose(matrika), var), matrika) #matrika je (23,2) var je  (23,23). produkt 2x23 * 23x23 * 23x2
             #v info množiš r+1xn * nxn * nxr+1
