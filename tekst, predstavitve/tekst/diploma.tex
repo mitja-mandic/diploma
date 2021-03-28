@@ -145,19 +145,19 @@ Teorijo bom osvetlil tudi s praktičnimi primeri.
 Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
 pri posploševanju rezultatov. Slučajni vektor $Y$ torej pripada \textit{enoparametrični eksponentni družini,} če je njegova gostota oblike 
 \begin{equation}
-    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{A(y\cdot\theta - \gamma(\theta))}{\phi} + \tau(y, \frac{\phi}{A})\right)},
+    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{(y\theta - b(\theta))}{a(\phi)} + c(y, \phi)\right)},
 \end{equation}
-za vektorski parameter $\theta,$ ki ga pogosto imenujemo \textit{kanonični} ali \textit{naravni} parameter, disperzijski parameter $\phi$, utež $A,$
-ter dani funkciji $\gamma, \tau.$ 
+za neke funkcije $a(\cdot), b(\cdot)\text{~in~}c(\cdot).$ Če je $\phi$ znan je to eksponentna družina s \textit{kanoničnim} ali \textit{naravnim} parametrom $\theta.$
 
 Koristno je tudi pogledati logaritem zgornje enačbe
 \begin{align}
-    \ell(\theta) &= \log f_{Y}(y; \theta, \phi) = A\frac{y\cdot\theta - \gamma{\theta}}{\phi} + \tau(y,\frac{\phi}{A}) \\
-    \frac{\partial}{\partial \theta}\ell &= \frac{A}{\phi}(y - \gamma'(\theta))
+    \ell(\theta) &= \log f_{Y}(y; \theta, \phi) = \frac{y\theta - b(\theta)}{a(\phi)} + c(y,\phi) \\
+    \frac{\partial}{\partial \theta}\ell &= \frac{(y - b'(\theta))}{a(\phi)} \\
+    \frac{\partial^2}{\partial \theta^2}\ell &= -\frac{b''(\theta)}{a(\phi)}
 \end{align}
 Izkaže se, da za slučajne vektorje z gostoto iz eksponentne družine veljata naslednji zvezi %še nevem če bom dokazoval. VPRAŠAJ SMREKIJA
 \begin{equation}\label{izp}    
-    \mathbb{E}(Y) = \mu = \gamma'(\theta), \mathrm{Var}(Y) = \frac{\phi}{A}\gamma''(\theta)
+    \mathbb{E}(Y) = \mu = b'(\theta), \mathrm{Var}(Y) = \frac{\phi}{A}\gamma''(\theta)
 \end{equation}
 
 Poleg formul za izračun variance in pričakovane vrednosti nam zgornji rezultat pove še, da je za porazdelitve eksponentne družine varianca funkcija pričakovane vrednosti.
@@ -253,7 +253,7 @@ momentov,t.j. če v danem modelu ti momenti obstajajo,
 \] za neko funkcijo g, potem $c(X)$ ocenjujemo s cenilko $g(\hat{m}_{1},\ldots,\hat{m}_{r}).$ Če je g zvezna, dobimo dosledno cenilko.
 
 \subsubsection{Metoda največjega verjetja}
-Imejmo parametrični model s prostorom parametrov $\Theta$ in pripadajoč vektorski parameter $\theta = (\theta_{1},\ldots,\theta_{r}).$
+Imejmo parametrični model s prostorom parametrov $\Theta \subseteq \mathbb{R}^{r}$ in pripadajoč vektorski parameter $\theta = (\theta_{1},\ldots,\theta_{r}).$
 Privzemimo, da imajo vse proučevane porazdelitve gostote oziroma verjetnostne funkcije oblike
 \[
     f(x;\theta) = f(x;\theta_{1},\ldots,\theta_{r}).
@@ -275,7 +275,7 @@ Opazimo, da si računanje lahko precej poenostavimo, če obe strani zgornje ena�
 Funkciji $L$ rečemo logaritemska funkcija verjetja, njene stacionarne točke pa bodo kandidati za cenilko največjega verjetja. Ker je logaritem 
 naraščajoča funkcija, bodo ekstremi $L$ in $\ell$ sovpadali. Rešiti moramo torej sistem enačb
 \begin{equation}\label{mle}
-    \frac{\partial}{\partial_{j}}(L(\theta)) = 0~,j=1,\ldots,r,
+    \frac{\partial}{\partial \theta_{j}}(L(\theta)) = 0~,j=1,\ldots,r,
 \end{equation}
 ki mu rečemo tudi sistem \textit{enačb verjetja}, odvod logaritemske funkcije verjetja pa v statistiki pogosto poimenujejo \textit{zbirna funkcija}.
 Ko rešimo enačbe verjetja, najdemo ekstrem funkcije verjetja in dobimo \textit{cenilko največjega verjetja}, v angleščini pogosto označeno MLE (okrajšava za
@@ -416,7 +416,7 @@ bomo kasneje pokazali, je zanjo potrebno izračunati še drugi odvod, zato to st
 \end{align}
 Vse sedaj skupaj sestavimo v
 \begin{align}
-    \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} = - \sum_{i}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right),~~j,k = 0,1,\ldots, r
+    \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} \ell(\beta)= - \sum_{i}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right),~~j,k = 0,1,\ldots, r
 \end{align}
 Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $var(Y_{i}) = v_{i}(\beta) = n_{i}p_{i}(1-p_{i}),$~kar vključimo v zgornjo enačbo in končno dobimo
 \begin{align}
@@ -434,15 +434,15 @@ Vektorsko definiramu tudi
                             \exp{x_{n}^\top\beta}
                             \end{bmatrix},
 \]
-spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo
+spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo %DOPOLNI KER NI NITI MALO JASNO OD KOD TO PRIDE
 \begin{align} \label{ell}
     \ell(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
     &= y^\top\mathbf{X}\beta - n^\top \log(1 + \exp{\mathbf{X}\beta}),
 \end{align}
 in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
-\begin{align}
+\begin{equation}
     \dot{\ell}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
-\end{align}
+\end{equation}
 kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
 S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komponent in torej lahko zapišemo
 \begin{equation}
