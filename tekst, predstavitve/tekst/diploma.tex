@@ -24,8 +24,10 @@
 \usepackage{mathtools}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\usepackage[ruled,vlined]{algorithm2e}
-%\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{caption}
+
 % ne spreminjaj podatkov, ki vplivajo na obliko strani
 \textwidth 15cm
 \textheight 24cm
@@ -52,7 +54,8 @@
 \newtheorem{trditev}[definicija]{Trditev}
 \newtheorem{posledica}[definicija]{Posledica}
 
-
+\DeclareCaptionFormat{myformat}{#3}
+\captionsetup[algorithm]{format = myformat}
 % za stevilske mnozice uporabi naslednje simbole
 \newcommand{\R}{\mathbb R}
 \newcommand{\N}{\mathbb N}
@@ -141,7 +144,7 @@ V dobi ogromne množice podatkov je računska učinkovitost ključni del obdelav
 V delu bom najprej predstavil posplošene linearne modele in najpriljubljenejše numerične metode, ki se uporabljajo za njihovo obdelavo. 
 Teorijo bom osvetlil tudi s praktičnimi primeri.
 
-\section{Eksponentna družina} %mal razložim, predvsem da bom kasneje dokazal enakost N-R in F-S
+\section{Eksponentna družina} 
 Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
 pri posploševanju rezultatov. Slučajni vektor $Y$ torej pripada \textit{enoparametrični eksponentni družini,} če je njegova gostota oblike 
 \begin{equation}
@@ -151,16 +154,57 @@ za neke funkcije $a(\cdot), b(\cdot)\text{~in~}c(\cdot).$ Če je $\phi$ znan je 
 
 Koristno je tudi pogledati logaritem zgornje enačbe
 \begin{align}
-    \ell(\theta) &= \log f_{Y}(y; \theta, \phi) = \frac{y\theta - b(\theta)}{a(\phi)} + c(y,\phi) \\
-    \frac{\partial}{\partial \theta}\ell &= \frac{(y - b'(\theta))}{a(\phi)} \\
-    \frac{\partial^2}{\partial \theta^2}\ell &= -\frac{b''(\theta)}{a(\phi)}
+    \log f_{Y}(y; \theta, \phi) &= \frac{y\theta - b(\theta)}{a(\phi)} + c(y,\phi) \\
+    \frac{\partial}{\partial \theta} \log f_{Y}(y;\theta, \phi) &= V_{\theta}(y) = \frac{(y - b'(\theta))}{a(\phi)} \\
+    \frac{\partial^2}{\partial \theta^2}\ell &= -\frac{b''(\theta)}{a(\phi)},
 \end{align}
-Izkaže se, da za slučajne vektorje z gostoto iz eksponentne družine veljata naslednji zvezi %še nevem če bom dokazoval. VPRAŠAJ SMREKIJA
-\begin{equation}\label{izp}    
-    \mathbb{E}(Y) = \mu = b'(\theta), \mathrm{Var}(Y) = \frac{\phi}{A}\gamma''(\theta)
-\end{equation}
+kjer funkcijo $V$ imenujemo tudi \textit{funkcija zbira}, oziroma v angleščini \textit{score function.}
 
-Poleg formul za izračun variance in pričakovane vrednosti nam zgornji rezultat pove še, da je za porazdelitve eksponentne družine varianca funkcija pričakovane vrednosti.
+
+Dokažimo sedaj nekaj koristnih zvez, ki jih bomo uporabili v kasnejših izpeljavah.
+
+\begin{trditev} \label{izp}
+    Naj bo Y slučajna spremenljivka, katere gostota pripada eksponentni družini. Potem za pričakovano vrednost in varianco veljata sledeči zvezi:
+    \[
+        \mathbb{E}(Y) = b'(\theta)a(\phi),~~Var(Y) = -b''(\theta)a(\phi)
+    \]
+\end{trditev}
+\begin{proof}
+Za dokaz prve enakosti si poglejmo
+\begin{align*}
+    \mathbb{E}(V(y)) &= \int f_{Y}\frac{\partial}{\partial \theta}\log f_{Y}(y;\theta,\phi) \,dy = \int f_{Y}(y)\frac{1}{f_{Y}(y)}\frac{\partial f_{Y}(y)}{\partial\theta}\,dy \nonumber\\
+    &=\int\frac{\partial f_{Y}(y)}{\partial \theta} \,dy= \frac{\partial}{\partial \theta}\int f_{Y}(y)\,dy = \frac{\partial}{\partial \theta}1 = 0,
+\end{align*}
+saj je $f_{Y}(y)$ gostota.
+Od tu sledi
+\begin{align*}
+    \mathbb{E}(V(y)) &= \mathbb{E}(\frac{Y - b'(\theta)}{a(\phi)}) = 0 \\
+    \mathbb{E}(Y) &= b'(\theta)a(\phi)
+\end{align*}
+Za drugo pa si oglejmo
+\begin{align*}
+    \mathbb{E}(\frac{\partial}{\partial\theta}V(y) - V(y)^2) &= \int f_{Y}(y)\left(\frac{\partial}{\partial \theta} \left(\frac{1}{f_{Y}(y)}\frac{\partial f_{Y}(y)}{\partial\theta}\right) + \left(\frac{\partial}{\partial\theta}\log f_{Y}(y)\right)^2\right) \,dy \\
+    &= \int f_{Y}(y)\left(-\frac{1}{f_{Y}(y)^2}\left(\frac{\partial f_{Y}(y)}{\partial\theta}\right)^2 + \frac{1}{f_{Y}(y)}\frac{\partial^2f_{Y}(y)}{\partial\theta^2} + \left(\frac{1}{f_{Y}(y)}\frac{\partial f_{Y}(y)}{\partial\theta}\right)^2  \right)\,dy \\
+    &=\int \frac{\partial^2}{\partial\theta^2} f_{Y}(y) \,dy = \frac{\partial^2}{\partial\theta^2}\int f_{Y}(y)\,dy = 0
+\end{align*}
+Spet uporabimo prej izpeljane zveze in dobimo
+\begin{gather*}
+    \frac{\partial^2}{\partial\theta^2}\log f_{Y}(y) = \frac{\partial}{\partial\theta}\left(\frac{y-b'(\theta)}{a(\phi)}\right) = -\frac{b''(\theta)}{a\phi},~~\mathbb{E}\left(-\frac{b''(\theta)}{a\phi}\right) = -\frac{b''(\theta)}{a\phi} \\
+    \mathbb{E}\left(V(y)^2\right) = \mathbb{E}\left(\left(\frac{Y-b'(\theta)}{a(\phi)}\right)^2\right) = \frac{1}{a(\phi)^2}\mathbb{E}((Y - \mathbb{E}(Y))^2) = \frac{1}{a(\phi)^2}Var(Y),
+\end{gather*}
+in po zgoraj dokazani enakosti za funkcijo zbira torej velja
+\begin{align*}
+    -\mathbb{E}\left(\frac{\partial^2}{\partial\theta^2}f_{Y}(y)\right) &= \mathbb{E}\left(V(Y)^2\right) \\
+    -\frac{b''(\theta)}{a\phi} &= \frac{1}{a(\phi)^2}Var(Y) \\
+    \mathrm{Var}(Y) &= -a(\phi)b''(\theta)
+\end{align*}
+\end{proof}
+
+Zgornja trditev nam torej pove, da lahko pričakovano vrednost in varianco porazdelitve iz eksponentne družine, z nekaj odvajanja, preberemo kar iz gostote - izognemo se integriraciji. Po drugi
+strani pa vidimo, da je varianca le funkcija pričakovane vrednosti. 
+
+Pričakovano vrednost kvadrata funkcije zbira v splošnem imenujemo \textit{Fisherjeva informacija}, $FI(\theta) = E((V(Y))^2),$ izpeljano zvezo, ki poveže funkcijo zbira in njene odvode pa \textit{informacijska enakost.}
+Uporabnost teh zvez bo postala jasna v sledečih poglavjih.
 
 Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
 \begin{itemize}
@@ -168,18 +212,18 @@ Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
     ima gostoto $f_{Y}(y) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left(-\frac{(y-\mu)^2}{2\sigma^2}\right)}.$
     Če zgornjo enačbo logaritmiramo dobimo
     \begin{align*}
-        \ell(\mu, \sigma; y) &= \log\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right) -\frac{(y-\mu)^2}{2\sigma^2} = -\frac{1}{2}\log(2\sigma^2\pi) - \frac{y^2 - 2\mu y + \mu^2}{2 \sigma^2}    \\ \nonumber
+        \log f_{Y}(y;\mu, \sigma) &= \log\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right) -\frac{(y-\mu)^2}{2\sigma^2} = -\frac{1}{2}\log(2\sigma^2\pi) - \frac{y^2 - 2\mu y + \mu^2}{2 \sigma^2}    \\ \nonumber
                             &= \frac{y\mu-\nicefrac{\mu^2}{2}}{\sigma^2} - \frac{1}{2}\left(\frac{y^2}{\sigma^2} + \log(2\pi\sigma^2)\right) 
     \end{align*}
     Od tu preberemo zgoraj definirane vrednosti
     \[
-        \theta = \mu,~\phi = \sigma^2,~\gamma(\theta) = \frac{\theta^2}{2},~A = 1,
+        \theta = \mu,~a(\phi) = \sigma^2,~b(\theta) = \frac{\theta^2}{2}
     \]
     in takoj sledijo zaključki
     \[
-        \mathbb{E}(Y) = \gamma'(\theta) = \mu \text{ in } \mathrm{Var}(Y) = \frac{\phi}{A}\gamma''(\theta) = \sigma^2,
+        \mathbb{E}(Y) = b'(\theta) = \mu \text{ in } \mathrm{Var}(Y) = a(\phi)b''(\theta) = \sigma^2,
     \]
-    kar se ujema z enačbami \refeq{izp}.
+    kar se ujema z zvezami iz trditve \ref{izp}.
 
     \item \textbf{Binomska porazdelitev.} Imejmo binomsko porazdeljen slučajni vektor $Y \sim \mathrm{Bin}(n,p).$ Verjetnost 
     \[
@@ -187,12 +231,13 @@ Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
     \]
     od koder direktno sledi
     \[
-        \theta = \log\frac{p}{1-p},~\gamma(\theta) = n\log(1 + e^{\theta}),~\phi = 1,
+        \theta = \log\frac{p}{1-p},~b(\theta) = n\log(1 + e^{\theta}),~a(\phi) = 1,
     \]
     in opazimo da je tokrat naravni parameter $\log\frac{1}{1-p},$ kar imenujemo tudi \textit{logit} verjetnosti. Pomembnost tega rezultata 
     bomo videli v naslednjih poglavjih.
 \end{itemize}
 
+Poleg omenjenih, spadajo v eksponentno družino še Gamma, $\chi^2,$ eksponenta, Poissonova in kar nekaj drugih porazdelitev.
 \section{Posplošeni linearni modeli}
 
 \subsection{Sestavni deli posplošenega linearnega modela}
@@ -260,20 +305,20 @@ Privzemimo, da imajo vse proučevane porazdelitve gostote oziroma verjetnostne f
 \]
 Funkcijo verjetja za vzorec velikosti $n$ definiramo kot funkcijo paramtetra $\theta$, in sicer
 \[
-    \ell(X_{1},\ldots,X_{n};\underbrace{\theta_{1},\ldots,\theta_{r}}_{\theta}) = f(X_{1},\theta)\cdots f(X_{n},\theta).
+    F(X_{1},\ldots,X_{n};\underbrace{\theta_{1},\ldots,\theta_{r}}_{\theta}) = f(X_{1},\theta)\cdots f(X_{n},\theta).
 \]
-Kot funkcija vektorja $x$ pa je $\ell$ gostota slučajnega vektorja $X = (X_{1},\ldots,X_{n}).$
+Kot funkcija vektorja $x$ pa je $F$ gostota slučajnega vektorja $X = (X_{1},\ldots,X_{n}).$
 
 Najti želimo tak parameter, v katerem bo funkcija verjetja zavzela svoj maksimum, torej 
 \[
-    \ell(\hat{\theta}) = \underset{\theta \in \Theta}{\max}{\ell(\theta)}.
+    F(\hat{\theta}) = \underset{\theta \in \Theta}{\max}{F(\theta)}.
 \]
 Opazimo, da si računanje lahko precej poenostavimo, če obe strani zgornje enačbe logaritmiramo
 \begin{equation}
-    \log(\ell(\theta)) = L(\theta) = \sum_{i=1}^{n}\log f(x_{i},\theta).
+    \log(F(\theta)) = L(\theta) = \sum_{i=1}^{n}\log f(x_{i},\theta).
 \end{equation}
 Funkciji $L$ rečemo logaritemska funkcija verjetja, njene stacionarne točke pa bodo kandidati za cenilko največjega verjetja. Ker je logaritem 
-naraščajoča funkcija, bodo ekstremi $L$ in $\ell$ sovpadali. Rešiti moramo torej sistem enačb
+naraščajoča funkcija, bodo ekstremi $L$ in $F$ sovpadali. Rešiti moramo torej sistem enačb
 \begin{equation}\label{mle}
     \frac{\partial}{\partial \theta_{j}}(L(\theta)) = 0~,j=1,\ldots,r,
 \end{equation}
@@ -339,7 +384,7 @@ Kot v vsakem posplošenem linearnem modelu tudi v tem predpostavimo neodvisnost 
 Naprej si oglejmo logaritemsko funkcijo verjetja. V nadaljnem računanju bom izpuščal binomski simbol na začetku - je samo konstanta, ki na
 končen rezultat nima vpliva. Po prejšnjih oznakah je torej
 \begin{align}\label{logit1}
-    \ell(p_{i}) &= \log\{\prod_{i=1}^{n} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}} \} \nonumber  \\
+    L(p_{i}) &= \log\{\prod_{i=1}^{n} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}} \} \nonumber  \\
         &= \sum_{i=1}^{n}\{y_{i}\log{p_{i}} + (n_{i} - y_{i})\log(1 - p_{i})\} \nonumber \\
         &= \sum_{i=1}^{n}\{n_{i}\log{(1-p_{i})}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\}
 \end{align}
@@ -469,11 +514,25 @@ torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}
 
 \subsection{Kanonični modeli v splošnem}
 Kot bomo spoznali v sledečem razdelku, spada logistična regresija med tako imenovane modele s "'kanonično"` povezovalno funkcijo. 
+Za vpeljavo tega ter prenekaterih ostalih pojmov pa potrebujemo nekaj dodatne teorije.
 
 \subsubsection{Kaj so kanonične povezovalne funkcije?}
 Kot smo omenili že v uvodu povezovalna funkcija opisuje relacijo med pričakovano vrednostjo opazovane spremenljivke in desno stranjo našega modela, torej
-sistematično komponento modela. Za vsako porazdelitev iz eksponentne družine, ki jo opazovani spremenljivki pripišemo, obstaja \textit{naravna} ali \textit{kanonična}
-povezovalna funkcija. V spodnji tabeli so prikazani primeri takih funkcij
+sistematično komponento modela. Eksponentno družino torej v splošnem sestavljajo porazdelitve, z gostotami oblike
+\[
+    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{(y\theta - b(\theta))}{a(\phi)} + c(y, \phi)\right)}.
+\]
+Enačbo logaritmiramo in dobimo
+\[
+    L(y;\theta) = \frac{y\theta-b(\theta)}{a(\phi)} + c(y;\phi),
+\]
+njen odvod, torej funkcija zbira pa je 
+\[
+    \frac{\partial}{\partial \theta} L(y;\theta) = \frac{y-b'(\theta)}{a(\phi)}.
+\]
+O kanonični povezovalni funkciji govorimo, če velja $\theta=\eta,$ torej je naravni parameter eksponentne družine ravno enak funkciji pričakovane vrednosti v modelu.
+Da uporabimo logit verjetnosti v logističnem modelu torej ni naključje - videli smo, da je $\textbf{logit}(p_{i})$ enak parametru $\theta.$ Spodaj je navedenih še nekaj ostalih
+kanoničnih povezovalnih funkcij, njihovo uporabnost bomo spoznali v naslednjem razdelku.
 
 \begin{center}
     \begin{tabular}{ | c | c | c |}
@@ -782,39 +841,73 @@ V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu n
 
 \subsubsection{Algoritem za logistični model}
 
-\begin{algorithm}[h]
-    \caption{oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
-    \SetAlgoLined
-    %\KwResult{Write here the result }
-    Nastavimo začetne vrednosti\;
-    $p = \frac{\exp{(X^\top \beta_{star})}}{1 + \exp{(X^\top \beta_{star})}}$ \;
-    $V = p(1 - p)$ \;
-    $zacetniScore = X^\top (Y - p)$ \;
-    $zacetniInfo = X^\top V X$ \;
+%\begin{algorithm}[h]
+%    \caption{oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
+%    \SetAlgoLined
+%    %\KwResult{Write here the result }
+%    Nastavimo začetne vrednosti\;
+%    $p = \frac{\exp{(X^\top \beta_{star})}}{1 + \exp{(X^\top \beta_{star})}}$ \;
+%    $V = p(1 - p)$ \;
+%    $zacetniScore = X^\top (Y - p)$ \;
+%    $zacetniInfo = X^\top V X$ \;
+%    
+%    Reši sistem na h: $zacetniInfo * h = zacetniScore$ \;
+%    $\beta_{star} = \beta_{zacetni}$
+%    $\beta_{nov} = \beta_{star} + h$ \;
+%    \While{$i \leq \text{iteracije}$}{
+%        %instructions\;
+%        \eIf{$\beta_{nov} - \beta_{star} \geq \epsilon$}{
+%            $p = \frac{\exp{(X^\top \beta_{nov})}}{1 + \exp{(X^\top \beta_{nov})}}$ \;
+%            $V = p(1 - p)$ \;
+%            $Score = X^\top (Y - p)$ \;
+%            $Info = X^\top V X$ \;
+%            Razreši na h: 
+%            $Info * h = Score$ \;
+%            $\beta_{star} = \beta_{nov}$ \;
+%            $\beta_{nov} = \beta_{star} + h$ \;
+%        %instructions2\;
+%        }{
+%        Dosegli smo želeno natančnost v zadostnem številu korakov\;
+%        \Return{$\beta_{nov}$}
+%        }
+%    }
+%\end{algorithm}
+%\begin{algorithm}
+%    \caption{}
+%\pagebreak %mejbi ni idealno ampak more bit da se algoritem lepo obnaša
+\begin{algorithm}[H]
+    \caption{\textbf{function} oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
+\begin{algorithmic}
     
-    Reši sistem na h: $zacetniInfo * h = zacetniScore$ \;
-    $\beta_{star} = \beta_{zacetni}$
-    $\beta_{nov} = \beta_{star} + h$ \;
-    \While{$i \leq \text{iteracije}$}{
-        %instructions\;
-        \eIf{$\beta_{nov} - \beta_{star} \geq \epsilon$}{
-            $p = \frac{\exp{(X^\top \beta_{nov})}}{1 + \exp{(X^\top \beta_{nov})}}$ \;
-            $V = p(1 - p)$ \;
-            $Score = X^\top (Y - p)$ \;
-            $Info = X^\top V X$ \;
-            Razreši na h: 
-            $Info * h = Score$ \;
-            $\beta_{star} = \beta_{nov}$ \;
-            $\beta_{nov} = \beta_{star} + h$ \;
-        %instructions2\;
-        }{
-        Dosegli smo želeno natančnost v zadostnem številu korakov\;
-        \Return{$\beta_{nov}$}
-        }
-    }
+    %\COMMENT 
+    \STATE $p = \frac{\exp{(X^\top \beta_{star})}}{1 + \exp{(X^\top \beta_{star})}}$
+    \STATE $V = p(1 - p)$ 
+    \STATE $Score = X^\top (Y - p)$ 
+    \STATE $Info = X^\top V X$ 
+    
+    \STATE \text{\textit{Reši sistem na h:}} $Info * h = Score$
+    \STATE $\beta_{star} = \beta_{zacetni}$
+    \STATE $\beta_{nov} = \beta_{star} + h$
+    \WHILE{$i \leq \text{iteracije}$}
+        
+        \IF{$\beta_{nov} - \beta_{star} \geq \epsilon$}
+            \STATE $p = \frac{\exp{(X^\top \beta_{nov})}}{1 + \exp{(X^\top \beta_{nov})}}$ 
+            \STATE $V = p(1 - p)$ 
+            \STATE $Score = X^\top (Y - p)$ 
+            \STATE $Info = X^\top V X$ 
+            \STATE \text{\textit{Razreši na h:}}
+            \STATE $Info * h = Score$ 
+            \STATE $\beta_{star} = \beta_{nov}$ 
+            \STATE $\beta_{nov} = \beta_{star} + h$ 
+        \ELSE
+        \STATE \text{\textit{Dosegli smo želeno natančnost v zadostnem številu korakov}}
+        \RETURN $\beta_{nov}$
+        \ENDIF
+        
+    \ENDWHILE
+\end{algorithmic}
+
 \end{algorithm}
-
-
 \subsection{Ocenjevanje parametrov v probit modelu}
 
 \subsubsection{Algoritem za probit model}
