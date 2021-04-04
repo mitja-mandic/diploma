@@ -11,7 +11,7 @@ new_path = os.path.relpath('..\\podatki\\podatki.txt', cur_path)
 
 podatki = pd.read_csv("diploma\\koda\\podatki.txt")
 podatki['dodatna'] = 1
-matrika = podatki[['dodatna','TEMPERATURE']].values
+matrika = podatki[['dodatna','TEMPERATURE','PRESSURE']].values
 vrednosti_y = podatki[['O_RING_FAILURE']].values
 #print(podatki[['dodatna']])
 #print(podatki.columns)
@@ -33,34 +33,59 @@ resitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
 fitted = resitev['p']
 intercept = resitev['parametri'][0]
 slope = resitev['parametri'][1]
-print(intercept,slope)
+slope1 = resitev['parametri'][2]
+print(intercept,slope,slope1)
 #slope1 = resitev['parametri'][2]
 
 
-
-
-#print(fitted)
+def f(x, y):
+    return np.exp(intercept + x * slope + y * slope1)/ (1 + np.exp(intercept + x * slope + y * slope1))
 
 def main():
-    x = np.linspace(40,90,1000)
+    x = np.linspace(30,90,1000)
+    y = np.linspace(50,200,1000)
+    X,Y = np.meshgrid(x,y)
     #y = np.exp(intercept + x * slope + (x ** 2) * slope1) / (1 + np.exp(intercept + x * slope + (x ** 2) * slope1))
-    y = np.exp(intercept + x * slope)/ (1 + np.exp(intercept + x * slope))
+    Z = f(X,Y)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot_surface(X, Y, Z,cmap='viridis',edgecolor='none')
+    
+    
+    
+    
+    
     #plt.figure()
-    plt.plot(x, y, label = 'Logit')
+    #plt.plot(x, y,z, label = 'Logit')
     #plt.xlabel('$x$')
     #plt.ylabel('$\exp(x)$')
 
     #plt.plot(podatki_hrosci[['conc']].values,fitted, 'o')
-    plt.plot(podatki[['TEMPERATURE']].values,fitted, 'o',label = 'Izračunane verjetnosti')
-    plt.plot(podatki[['TEMPERATURE']].values, podatki[['O_RING_FAILURE']].values,'o', label = 'Podatki')
-    plt.legend()
+    #plt.plot(podatki[['TEMPERATURE']].values,fitted, 'o',label = 'Izračunane verjetnosti')
+    #plt.plot(podatki[['TEMPERATURE']].values, podatki[['O_RING_FAILURE']].values,'o', label = 'Podatki')
+    #plt.legend()
 
     #plt.figure()
     #plt.plot(x, -np.exp(-x))
     #plt.xlabel('$x$')
     #plt.ylabel('$-\exp(-x)$')
-
-    #plt.show()
+    plt.show()
 
 if __name__ == '__main__':
     main()
+
+
+
+#
+#x = np.linspace(-6, 6, 30)
+#y = np.linspace(-6, 6, 30)
+#
+#X, Y = np.meshgrid(x, y)
+#Z = f(X, Y)
+#fig = plt.figure()
+#ax = plt.axes(projection='3d')
+#ax.contour3D(X, Y, Z, 50, cmap='binary')
+#ax.set_xlabel('x')
+#ax.set_ylabel('y')
+#ax.set_zlabel('z')
+#plt.show()

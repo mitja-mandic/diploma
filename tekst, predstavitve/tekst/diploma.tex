@@ -136,19 +136,17 @@ V povzetku na kratko opi"si vsebinske rezultate dela. Sem ne sodi razlaga organi
 % tu se zacne besedilo seminarja
 \section{Uvod}
 Posplošeni linearni modeli so ključen del statsistične analize. Pomagajo nam bolje razumeti relacije med rezultati meritev in s temi izsledki
-predvideti trende v prihodnosti. Modeli morajo biti kar se da enostavni, ampak hkrati zagotavljati določeno natančnost. Vsa teorija nam pa v praksi
-ne koristi, če konkretnih številk ne znamo izračunati.
+predvideti trende v prihodnosti. Modeli morajo biti kar se da enostavni, ampak hkrati zagotavljati določeno natančnost. Ogledali si bomo nekaj različnih linearnih
+modelov, natančneje pa spoznali \textit{logistični model} za računanje verjetnosti dogodkov. Dokazali bomo tudi nekaj zvez, ki se tičejo eksponentne družine
+in kanoničih parametrov. Skozi slednje bomo utemeljili uporabo prilagojene Newtonove metode za reševanje sistema enačb verjetja, \textit{Fisher-scoring} algoritma,
+kje ležijo njegove prednosti pred običajno Newtonovo metodo in kako njegova uporaba izgleda v praksi.
 
-V dobi ogromne množice podatkov je računska učinkovitost ključni del obdelave. Tu nam pomagajo numerične metode.
-
-V delu bom najprej predstavil posplošene linearne modele in najpriljubljenejše numerične metode, ki se uporabljajo za njihovo obdelavo. 
-Teorijo bom osvetlil tudi s praktičnimi primeri.
-
+V zadnjem delu naloge bomo predstavili tudi vso izpeljano teorijo v praksi - izpeljali bomo algoritem, potem pa ga preizkusili na konretnih podatkih.
 \section{Eksponentna družina} 
 Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
 pri posploševanju rezultatov. Slučajni vektor $Y$ torej pripada \textit{enoparametrični eksponentni družini,} če je njegova gostota oblike 
 \begin{equation}
-    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{(y\theta - b(\theta))}{a(\phi)} + c(y, \phi)\right)},
+    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{y\theta - b(\theta)}{a(\phi)} + c(y, \phi)\right)},
 \end{equation}
 za neke funkcije $a(\cdot), b(\cdot)\text{~in~}c(\cdot).$ Če je $\phi$ znan je to eksponentna družina s \textit{kanoničnim} ali \textit{naravnim} parametrom $\theta.$
 
@@ -203,7 +201,7 @@ in po zgoraj dokazani enakosti za funkcijo zbira torej velja
 Zgornja trditev nam torej pove, da lahko pričakovano vrednost in varianco porazdelitve iz eksponentne družine, z nekaj odvajanja, preberemo kar iz gostote - izognemo se integriraciji. Po drugi
 strani pa vidimo, da je varianca le funkcija pričakovane vrednosti. 
 
-Pričakovano vrednost kvadrata funkcije zbira v splošnem imenujemo \textit{Fisherjeva informacija}, $FI(\theta) = E((V(Y))^2),$ izpeljano zvezo, ki poveže funkcijo zbira in njene odvode pa \textit{informacijska enakost.}
+Pričakovano vrednost kvadrata funkcije zbira v splošnem imenujemo \textit{Fisherjeva informacija}, $\mathrm{FI}(\theta) = E((V(Y))^2),$ izpeljano zvezo, ki poveže funkcijo zbira in njene odvode pa \textit{informacijska enakost.}
 Uporabnost teh zvez bo postala jasna v sledečih poglavjih.
 
 Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
@@ -233,8 +231,7 @@ Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
     \[
         \theta = \log\frac{p}{1-p},~b(\theta) = n\log(1 + e^{\theta}),~a(\phi) = 1,
     \]
-    in opazimo da je tokrat naravni parameter $\log\frac{1}{1-p},$ kar imenujemo tudi \textit{logit} verjetnosti. Pomembnost tega rezultata 
-    bomo videli v naslednjih poglavjih.
+    in opazimo da je tokrat naravni parameter $\log\frac{1}{1-p},$ kar imenujemo tudi \textit{logit} verjetnosti.
 \end{itemize}
 
 Poleg omenjenih, spadajo v eksponentno družino še Gamma, $\chi^2,$ eksponenta, Poissonova in kar nekaj drugih porazdelitev.
@@ -280,7 +277,7 @@ Preden se natančneje posvetimo posplošenim linearnim modelom, si oglejmo dve n
 Najprej si definirajmo nekaj pojmov, ki jih bomo uporabljali v nadaljnjih poglavjih.
 
 \textit{Cenilka} za realnoštevilsko karatkreristiko $c$ proučevane porazdelitve je funkcija vzorca $T=T(X_{1},\ldots,X_{n})$, s katero ocenjujemo $c.$
-Ta cenilka je \textit{nepristranska}, če za porazdelitev vzorca $F$ velja $E(T(X_{1},\ldots,X_{n})) = c(F).$
+Ta cenilka je \textit{nepristranska}, če za porazdelitev vzorca $F$ velja $\mathbb{E}(T(X_{1},\ldots,X_{n})) = c(F).$
 Imejmo sedaj zaporedje cenilk za vzorce velikosti $n=1,2,\ldots.$ To zaporedje je \textit{dosledno}, če v verjetnosti konvergira h konstanti $c(F).$
 
 Če povzamem z drugimi besedami; nepristranska cenilka nam v povprečju vrne pravi rezultat, dosledna cenilka pa z večjim vzorcem vrne rezultat vedno
@@ -516,11 +513,11 @@ torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}
 Kot bomo spoznali v sledečem razdelku, spada logistična regresija med tako imenovane modele s "'kanonično"` povezovalno funkcijo. 
 Za vpeljavo tega ter prenekaterih ostalih pojmov pa potrebujemo nekaj dodatne teorije.
 
-\subsubsection{Kaj so kanonične povezovalne funkcije?}
+\subsubsection{Pomembnost kanoničnih povezvalnih funkcij}\label{kan}
 Kot smo omenili že v uvodu povezovalna funkcija opisuje relacijo med pričakovano vrednostjo opazovane spremenljivke in desno stranjo našega modela, torej
 sistematično komponento modela. Eksponentno družino torej v splošnem sestavljajo porazdelitve, z gostotami oblike
 \[
-    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{(y\theta - b(\theta))}{a(\phi)} + c(y, \phi)\right)}.
+    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{y\theta - b(\theta)}{a(\phi)} + c(y, \phi)\right)}.
 \]
 Enačbo logaritmiramo in dobimo
 \[
@@ -547,7 +544,60 @@ kanoničnih povezovalnih funkcij, njihovo uporabnost bomo spoznali v naslednjem 
     \end{tabular}
 \end{center}
 
-\subsection{Probit regresija}
+Kot smo že v zgledu z logistično regresijo videli, potrebujemo odvode logaritemske funkcije verjetja po parametrih $\beta.$ Uporabiti moramo torej verižno pravilo 
+\[
+    \frac{\partial L}{\partial\beta_{j}} = \left(\frac{\partial L}{\partial \theta}\right)\left(\frac{\partial \theta}{\partial\mu}\right)
+    \left(\frac{\partial\mu}{\partial\eta}\right)\left(\frac{\partial\eta}{\partial\beta_{j}}\right).
+\]
+Lotimo se ga po korakih. Prvi člen smo že zgoraj izračunali kot $\frac{y-b'(\theta)}{a(\phi)}.$ Z uporabo $(b')^{-1}(\mu) = \theta$ in pravila za odvajanje inverzne funkcije 
+dobimo $\frac{\partial \theta}{\partial\mu} = \frac{1}{b''(\theta)} = \frac{a(\phi)}{\mathrm{Var}(Y)},$ zadnji člen pa bo kar vedno enak $x_{ij}.$ Tretji člen je odvisen
+od povezovalne funkcije in se mu bomo posvetili nekoliko kasneje. Sestavimo vse skupaj in dobimo
+\[
+    \frac{\partial L}{\partial\beta_{j}} = \frac{y-\mu}{var(Y)}\frac{\partial \mu}{\partial\eta}x_{ij}.
+\]
+
+Opazimo: če imamo opravka s kanonično povezovalno funkcijo je $\eta = \theta!$ Torej namesto odvajanja po prvem parametru, lahko $\mu$ odvajamo po $\theta$ in
+dobimo $\frac{\partial\mu}{\partial\theta} = b''(\theta)$ in se odvod še dodatno poenostavi v
+\begin{equation}
+    \frac{\partial L}{\partial\beta_{j}} = \frac{y-\mu}{var(Y)}b''(\theta)x_{ij} = \frac{y-\mu}{a(\phi)}x_{ij}.
+\end{equation}
+
+Za numerične metode bomo potrebovali še druge odvode, kjer pa nam pomaga informacijska enakost iz dokaza trditve \ref{izp}.
+
+Najprej izračunajmo pričakovano vrednost odvoda funkcije zbira
+\begin{align*}
+    -\mathbb{E}(\frac{\partial^2 L}{\partial\beta_{j}\partial\beta_{k}}) &= \mathbb{E}((\frac{\partial L}{\partial \beta_{j}})(\frac{\partial L}{\partial \beta_{k}})) \\
+    &= \mathbb{E}(\frac{y-\mu}{var(Y)^2})(\frac{\partial\mu}{\partial\eta})^{2}x_{ij}x_{ik} \\
+    &= \frac{1}{var(Y)}(\frac{\partial\eta}{\partial\mu})^{2}x_{ij}x_{ik} \\
+    &= \frac{b''(\theta)}{a(\phi)}x_{ij}x_{ik}.
+\end{align*}
+
+Po drugi strani pa je običajen drugi odvod enak
+\begin{align*}    
+    \frac{\partial^2L}{\partial\beta_{j}\partial\beta_{k}} &= \frac{\partial}{\beta_{k}}\{\left(\frac{\partial L}{\partial\theta}\right)\left(\frac{\partial \theta}{\partial\beta_{j}}\right)\}\\
+    &= \frac{\partial L}{\partial\theta}\left(\frac{\partial^2\theta}{\partial\beta_{j}\partial\beta_{k}}\right) + \left(\frac{\partial\theta}{\partial\beta_{j}}\right)\left(\frac{\partial^2L}{\partial\theta^2}\frac{\partial\theta}{\partial\beta_{k}}\right) \\
+    &= 0 + \frac{\partial^2L}{\partial\theta^2}x_{ij}x_{ik},
+\end{align*}
+prej pa smo že dokazali da je
+\[
+    \frac{\partial^2L}{\partial\theta^2} = -\frac{b''(\theta)}{a(\phi)}.
+\]
+Sledi
+\begin{equation}\label{pv2odv}    
+    \mathbb{E}\left(\frac{\partial^2L}{\partial\theta^2}\right) = \frac{\partial^2L}{\partial\theta^2}.
+\end{equation}
+
+Uporabnost zgornjega rezultata pa nam bo dalo poglavje o numeričnih metodah.
+
+\subsubsection{Poljubna povezovalna funkcija}
+Za poljubno povezovalno funkcijo smo v zgornjem razdelku pokazali
+\begin{align*}    
+    \frac{\partial}{\partial\beta_{j}}L &= \frac{y-\mu}{\mathrm{Var}(Y)}\left(\frac{\partial\mu}{\partial\eta}\right)x_{ij}\\
+    -\mathbb{E}(\frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}) &= \frac{1}{\mathrm{Var}(Y)}\left(\frac{\partial\mu}{\partial\eta}\right)^2x_{ij}x_{ik}
+\end{align*}
+
+
+\subsection{Probit regresija} %a se bom s tem sploh ukvarjal tho
 Probit regresija se uporablja v podobne namene kot logistična, torej za določanje verjetnosti in razvrščanje. Razvili so jo v tridesetih letih
 dvajsetega stoletja, ime pa je skovanka -- pride iz angleških besed \textit{\textbf{prob}ability un\textbf{it}}. V glavnem se od logistične regresije
 razlikuje v sistematičnem delu. Verjetnost pozitivnega izida torej po modelu predpostavljamo
@@ -559,22 +609,22 @@ podana je kot
 \[
     \Phi(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{x}e^{\frac{-t^2}{2}}\,dt
 \]
-
+Očitno v tem primeru ne delamo s kanonično povezovalno funkcijo, kot smo to počeli v prejšnjem poglavju.
 \subsubsection{Ocenjevanje parametrov probit regresije}
 Podobno kot v logističnem modelu, se bomo ocenjevanja parametrov lotili po metodi največjega verjetja. 
 
-Za sistematični del modela privzemimo binomsko porazdeljene slučajne spremenljivke s parametroma $B(m_{i},p_{i}(\beta))$,
+Za sistematični del modela privzemimo binomsko porazdeljene slučajne spremenljivke s parametroma $\mathrm{Bin}(m_{i},p_{i}(\beta))$,
 verjetnost pozitivnega izida pa izrazimo z
 \[
     P(Y_{i} = y_{i}) = \binom{m_{i}}{y_{i}}p_{i}(\beta)^{y_{i}}(1 - p_{i}(\beta))^{m_{i} - y_{i}} = \binom{m_{i}}{y_{i}} (\Phi(x_{i}^\top \beta)^{y_{i}})(1 - \Phi(x_{i}^\top \beta))^{m_{i} - y_{i}} 
 \]
 Funkcijo verjetja, tako kot zgoraj izrazimo z gostotami posameznih komponent
 \[
-    \ell(\beta) = \prod_{i=1}^{n} \binom{m_{i}}{y_{i}} \Phi(x_{i}^\top\beta)^{y_{i}}(1 - \Phi(x_{i}^\top\beta))^{m_{i} - y_{i}},
+    F(\beta) = \prod_{i=1}^{n} \binom{m_{i}}{y_{i}} \Phi(x_{i}^\top\beta)^{y_{i}}(1 - \Phi(x_{i}^\top\beta))^{m_{i} - y_{i}},
 \]
 kjer binomski simbol izpustimo zaradi enostavnejšega pisanja. Zgornjo enačbo logaritmiramo in dobimo
 \begin{equation}
-    \log(\ell(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
+    \log(F(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
 \end{equation}
 Enačbo zopet odvajamo po parametru $\beta,$ vendar se nam v tem primeru ne poenostavi kot z logistično funkcijo.
 
@@ -773,57 +823,72 @@ Vidimo, da je potrebno ločiti dva primera:
 Fisher's scoring algoritem je variacija v prejšnjem razdelku opisanega Newton -- Raphsonovega algoritma, ki se v statistiki uporablja za numerično reševanje enačb največjega 
 verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških statistikov dvajsetega stoletja.
 
-Uvedimo najprej nekaj terminologije. Zbirna funkcija (angl. \textit{score function}) je gradient logaritemske funkcije verjetja po ocenjevanem parametru.
+Ponovimo najprej nekaj terminologije. Funkcija zbira je gradient logaritemske funkcije verjetja po ocenjevanem parametru.
 Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher) information matrix}) je definirana kot 
 \[
-    I(\theta) = \mathrm{E}[\nabla L(\theta) \nabla L(\theta)^\top ]. %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
+    \mathrm{FI}(\theta) = \mathbb{E}\left(\left(\frac{\partial}{\partial\theta} L(\theta)\right) \left(\frac{\partial}{\partial\theta} L(\theta)\right)^\top \right) %= \mathrm{E}[\dot{\ell}(\theta) \dot{\ell}(\theta)^\top].
 \]
-Fisher scoring algoritem sedaj je po zgornjih oznakah 
+Fisher scoring algoritem je po zgornjih oznakah 
 \begin{align}
-    \theta{n + 1} = \theta_{n} - I(\theta)^{-1}\nabla L(\theta)
+    \theta{n + 1} = \theta_{n} - FI(\theta)^{-1}\nabla L(\theta)
 \end{align}
-\subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
-V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikazali njegovo glavno prednost pred običajno Newtonovo iteracijo, opisano v poglavju \ref{nr}.
-Ob določenih predpostavkah o gladkosti logaritemske funkcije verjetja (ki za eksponentno družino vedno držijo), bomo sedaj pokazali, da je pričakovana vrednost
-zbirne funkcije enaka nič. Funkcijo verjetja tu pišemo kot logaritem gostote slučajnega vektorja.
-\begin{align} \label{Ezbirne}
-    \mathrm{E}[\nabla L (\theta)] &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
-        &= \int \nabla f_{\theta}(x) \,dx \overset{*}{=} \nabla \int f_{\theta}(x) \,dx = \nabla 1 = 0, 
-\end{align}
-kjer smo v enakosti $(*)$ zamenjali integracijo in odvajanje, kar po teoriji mere smemo - gostota porazdelitev eksponentne družine je zvezno odvedljiva. 
-Velja tudi
-\[
-    \nabla^{2} \log{f_{\theta}(x)} = \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \frac{\nabla f_{\theta}(x) \nabla f_{\theta}(x)^\top }{f_{\theta}(x)^{2}} = 
-    \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \dot{\ell}(\theta)\dot{\ell}(\theta)^\top,
-\]
-kjer smo v zadnji enakosti upoštevali
-\[
-    \nabla L (\theta) = \nabla \log(f_{\theta}(x)) = \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} 
-\]
-Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
-\begin{align}\label{infoeq}
-    I(\theta) &= \mathrm{E}[\nabla L(\theta)(\nabla L(\theta))^\top] =  -\int f_{\theta}(x) \nabla^2 \log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
-    &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
-\end{align}
-Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
-Kot smo videli v prejšnjih poglavjih, želimo imeti pozitivno semi-definitno matriko in s tem monoton algoritem. Izkaže se, da je informacijska matrika ravno variančno-kovariančna matrika
-zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vrednost zbirne funckije enaka 0. Potem takoj sledi
-\begin{align}
-    I(\theta) &= \mathrm{E}[\nabla L(\theta)\nabla L(\theta)^\top] \nonumber\\
-    &= \mathrm{E}[\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)^\top] \nonumber \\
-    &= \mathrm{Var}[\nabla L(\theta)].
-\end{align}
-Variančno-kovariančne matrike pa so pozitivno semi-definitne.
+%\subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
+%V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikazali njegovo glavno prednost pred običajno Newtonovo iteracijo, opisano v poglavju \ref{nr}.
+%
+%Ob določenih predpostavkah o gladkosti logaritemske funkcije verjetja (ki za eksponentno družino vedno držijo), bomo sedaj pokazali, da je pričakovana vrednost
+%zbirne funkcije enaka nič. Funkcijo verjetja tu pišemo kot logaritem gostote slučajnega vektorja.
+%\begin{align} \label{Ezbirne}
+%    \mathrm{E}[\nabla L (\theta)] &= \int f_{\theta}(x) \nabla_{\theta}\log(f_{\theta}(x)) \,dx = \int f_{\theta}(x) \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} \,dx \nonumber \\
+%        &= \int \nabla f_{\theta}(x) \,dx \overset{*}{=} \nabla \int f_{\theta}(x) \,dx = \nabla 1 = 0, 
+%\end{align}
+%kjer smo v enakosti $(*)$ zamenjali integracijo in odvajanje, kar po teoriji mere smemo - gostota porazdelitev eksponentne družine je zvezno odvedljiva. 
+%Velja tudi
+%\[
+%    \nabla^{2} \log{f_{\theta}(x)} = \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \frac{\nabla f_{\theta}(x) \nabla f_{\theta}(x)^\top }{f_{\theta}(x)^{2}} = 
+%    \frac{\nabla^2 f_{\theta}(x)}{f_{\theta}(x)} - \dot{\ell}(\theta)\dot{\ell}(\theta)^\top,
+%\]
+%kjer smo v zadnji enakosti upoštevali
+%\[
+%    \nabla L (\theta) = \nabla \log(f_{\theta}(x)) = \frac{\nabla f_{\theta}(x)}{f_{\theta}(x)} 
+%\]
+%Povzemimo vse, kar smo dokazali v prejšnjih enačbah in imamo
+%\begin{align}\label{infoeq}
+%    I(\theta) &= \mathrm{E}[\nabla L(\theta)(\nabla L(\theta))^\top] =  -\int f_{\theta}(x) \nabla^2 \log f_{\theta}(x) \,dx+ \int \nabla^2 f_{\theta}(x) \,dx \nonumber \\
+%    &= -\mathrm{E}[\nabla^2 \log f_{\theta}(x)] + \nabla^2\int \log f_{\theta}(x) \,dx = -\mathrm{E}[\nabla^2 \log f_{\theta}(x)]
+%\end{align}
+%Enačbi \eqref{infoeq} rečemo tudi \textit{informacijska enakost}. To nam bo koristilo pri dokazovanju enakosti med Newton -- Raphson algoritmom in Fisher scoringom za logistični model.
+%Kot smo videli v prejšnjih poglavjih, želimo imeti pozitivno semi-definitno matriko in s tem monoton algoritem. Izkaže se, da je informacijska matrika ravno variančno-kovariančna matrika
+%zbirne funkcije. Po enačbi \eqref{Ezbirne} se spomnimo, da je pričakovana vrednost zbirne funckije enaka 0. Potem takoj sledi
+%\begin{align}
+%    I(\theta) &= \mathrm{E}[\nabla L(\theta)\nabla L(\theta)^\top] \nonumber\\
+%    &= \mathrm{E}[\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)^\top] \nonumber \\
+%    &= \mathrm{Var}[\nabla L(\theta)].
+%\end{align}
+%Variančno-kovariančne matrike pa so pozitivno semi-definitne.
 
 \subsubsection{Ujemanje Newton-Raphson in Fisher's scoring za kanonične povezovalne funkcije}
-Kot si bomo v naslednjem razdelku natančneje pogledali za logistični model, Newton-Raphsonova metoda sovpada s Fisher's scoring za vse modele s kanonično povezovalno funkcijo.
+Spomnimo se zaključkov poglavja \ref{kan}. Tam smo dokazali, da za modele s kanonično povezovalno funkcijo velja $\mathbb{E}(\frac{\partial^2}{\partial\theta^2}L) = \frac{\partial^2}{\partial\theta^2},$
+po informacijski enakosti pa velja 
+\begin{equation*}
+    \mathrm{FI}(\theta) = \mathbb{E}\left((\nabla L)(\nabla L)^\top\right) = \mathbb{E}(\frac{\partial^2}{\partial\theta^2}L) = \frac{\partial^2}{\partial\theta^2}L \\
+    \rightarrow \mathrm{FI}(\theta) = \frac{\partial^2}{\partial\theta^2}L,
+\end{equation*}
+torej Fisherjeva informacija je za kanonične modele enaka Hessejevi matriki logaritemske funkcije verjetja! Poleg tega pa velja še
+\begin{align}
+    \mathrm{FI}(\theta) &= \mathrm{E}[(\nabla L(\theta))(\nabla L(\theta))^\top] \nonumber\\
+    &= \mathrm{E}[\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)^\top] \nonumber \\
+    &= \mathrm{Var}[\nabla L(\theta)],
+\end{align}
+variančno kovariančne matrike pa so pozitivno semidefinitne, kar pomeni da imamo konstanten algoritem.
 
 
+Povzemimo; za kanonične povezovalne funkcije smo dokazali enakost med Fisherjevo informacijo in Hessejevo matriko. S tem se v enem koraku izognemo računanju matrike drugih 
+odvodov in pridobimo pozitivno semidefinitno matriko v imenovalcu. Koristi uporabe kanoničnih povezovalnih funkcij so toraj očitne.
 
 \subsubsection{Fisher's scoring v logističnem modelu}
 Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
 \[
-    I(\theta) = \mathrm{E}[-\nabla ^2 L(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\nabla ^2 L(\theta),
+    \mathrm{FI}(\theta) = \mathbb{E}[-\nabla ^2 L(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\nabla ^2 L(\theta),
 \]
 kjer smo seveda uporabili tudi prej dokazano informacijsko enakost. Tako vidimo, da Fisher's scoring in Newton--Raphsonova metoda v primeru logistične regresije
 res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. Če zapišemo sedaj vse skupaj
@@ -831,6 +896,7 @@ res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. 
     \hat{\theta}_{i+1} &= \hat{\theta}_{i} - (\nabla^{2} L(\hat{\theta}_{i}))^{-1} \nabla L(\hat{\theta}_{i}) \nonumber \\
     &= \hat{\theta}_{i} + (\mathbf{X}^\top v(\hat{\theta}_{i}) \mathbf{X})^{-1}\mathbf{X}^\top(y - \mu(\hat{\theta}_{i})) 
 \end{align}
+
 \section{Primeri}
 \subsection{Ocenjevanje parametrov v logističnem modelu}
 
@@ -839,42 +905,12 @@ spremenljivke. Za delo v Pythonu smo uporabili več knjižnic\; \texttt{NumPy} z
 knjižnico \texttt{pandas} za uvoz podatkov in njihovo začetno urejanje. Na koncu smo si s paketom \texttt{Pyplot} iz knjižnice \texttt{Matplotlib} rezultate izrisali.
 V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu nebomo ponovno navajali.
 
-\subsubsection{Algoritem za logistični model}
-
-%\begin{algorithm}[h]
-%    \caption{oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
-%    \SetAlgoLined
-%    %\KwResult{Write here the result }
-%    Nastavimo začetne vrednosti\;
-%    $p = \frac{\exp{(X^\top \beta_{star})}}{1 + \exp{(X^\top \beta_{star})}}$ \;
-%    $V = p(1 - p)$ \;
-%    $zacetniScore = X^\top (Y - p)$ \;
-%    $zacetniInfo = X^\top V X$ \;
-%    
-%    Reši sistem na h: $zacetniInfo * h = zacetniScore$ \;
-%    $\beta_{star} = \beta_{zacetni}$
-%    $\beta_{nov} = \beta_{star} + h$ \;
-%    \While{$i \leq \text{iteracije}$}{
-%        %instructions\;
-%        \eIf{$\beta_{nov} - \beta_{star} \geq \epsilon$}{
-%            $p = \frac{\exp{(X^\top \beta_{nov})}}{1 + \exp{(X^\top \beta_{nov})}}$ \;
-%            $V = p(1 - p)$ \;
-%            $Score = X^\top (Y - p)$ \;
-%            $Info = X^\top V X$ \;
-%            Razreši na h: 
-%            $Info * h = Score$ \;
-%            $\beta_{star} = \beta_{nov}$ \;
-%            $\beta_{nov} = \beta_{star} + h$ \;
-%        %instructions2\;
-%        }{
-%        Dosegli smo želeno natančnost v zadostnem številu korakov\;
-%        \Return{$\beta_{nov}$}
-%        }
-%    }
-%\end{algorithm}
-%\begin{algorithm}
-%    \caption{}
-%\pagebreak %mejbi ni idealno ampak more bit da se algoritem lepo obnaša
+\subsubsection{Algoritem za logistični model in rezultati}
+Povežimo vso izpeljano teorijo v algoritem za ocenjevanje parametrov modela oblike
+\[
+    \mathrm{logit}(p_{i}) = X\beta,
+\]
+torej kanoničnega logističnega modela.
 \begin{algorithm}[H]
     \caption{\textbf{function} oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
 \begin{algorithmic}
@@ -906,8 +942,95 @@ V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu n
         
     \ENDWHILE
 \end{algorithmic}
-
 \end{algorithm}
+
+Algoritma pa ne bomo samo navedli, preizkusili ga bomo na konkretnih podatkih. Zanimalo nas bo, kako sta temperatura in pritisk vplivala na odpoved
+tesnil na vesoljskih misijah preden je v veljavo stopil \textit{Challenger}. Najprej bomo pogledali le enodimenzionalne ocene, potem pa vse skupaj združili.
+
+Spodaj je tabela; tej podatki so shranjeni v matriki $X,$ le da je tam dodan prvi stolpec enic - za izračun $\beta_{0},$ ki nastopa brez pojasnjevalne spremenljivke.
+\textit{POLET} označuje zaporedno številko poleta, \textit{TEMPERATURA} in \textit{PRITISK} sta temperatura in pritisk v okolici, \textit{TESNILO} pa je binarna
+spremenljivka - 1 označuje, da je tesnilo popustilo, 0 pa da je pogoje vzdržalo.
+\begin{center}
+\begin{table}[H]
+    \begin{tabular}{| c | c | c | c |}
+        \hline
+        POLET & TEMPERATURA & PRITISK & TESNILO \\
+        \hline
+        1&66&50&0\\
+        2&70&50&1\\
+        3&69&50&0\\
+        4&68&50&0\\
+        5&67&50&0\\
+        6&72&50&0\\
+        7&73&100&0\\
+        8&70&100&0\\
+        9&57&200&1\\
+        10&63&200&1\\
+        11&70&200&1\\
+        12&78&200&0\\
+        13&67&200&0\\
+        14&53&200&1\\
+        15&67&200&0\\
+        16&75&200&0\\
+        17&70&200&0\\
+        18&81&200&0\\
+        19&76&200&0\\
+        20&79&200&0\\
+        21&75&200&1\\
+        22&76&200&0\\
+        23&58&200&1\\
+        \hline
+\end{tabular}
+\caption{\label{podatki} Podatki uporabljeni v analizi}
+\end{table}
+\end{center}
+
+Poženimo algoritem najprej le na podatkih o temperaturi. Ker imamo le eno pojasnjevalno spremenljivko uporabljamo torej model oblike
+\[
+    \mathrm{logit}(p_{i}) = \beta_{0} + x_{i}\beta{1}
+\]
+Za izračun približka znotraj 1 tisočinke, z začetno vrednostjo $\beta = (0,0),$ smo potrebovali le nekaj korakov. Vstavimo v invertirano logit transformacijo in dobimo
+\[
+    p = \frac{e^{15.04290 - 0.23216x}}{1+e^{15.04290 - 0.23216x}},
+\]
+torej $\beta_{0} = 15.04290$ in $\beta_{1} = -0.23216.$ Če graf narišemo, dobimo
+\begin{center}
+    \begin{figure}[H]
+    \begin{tikzpicture}
+        \begin{axis}[
+            axis lines = center,
+            %xtick = {-10,-9,-8,...,9,10}
+            ytick = {0,0.1,0.2,...,1,1.1,1.2,1.3,1.4},
+            %ylabel = verjetnost,
+            %y label style = {at={(axis description cs:0.25,.5)},rotate=90}%,anchor=south}
+        ]
+        \addplot [
+            domain=40:90, 
+            samples=100, 
+            color=black,
+            ]
+            {exp(15.04290 - (0.23216 * x))/(1 + exp(15.04290 - (0.23216 * x)))};
+        %\addlegendentry{$x^2 + 2x + 1$}
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Izračunane verjetnosti}
+    \label{fig:logit1}
+    \end{figure}
+    \end{center}
+
+Vidimo da je sigmoida v tem primeru obrnjena drugače kot na sliki \ref{fig:sigmoid} - tak rezultat nam da negativen predznak parametra $\beta_{1}.$
+Sklepamo lahko torej da pri višjih temperaturah tesnila redkeje odpovejo.
+
+\begin{tikzpicture}
+    \begin{axis}
+    \addplot3[
+        surf,
+        domain=30:100
+    ]
+    {exp(13.29236 -0.22867*x-0.01040*y)/(1+exp(13.29236 -0.22867*x-0.01040*y))};
+    \end{axis}
+\end{tikzpicture}
 \subsection{Ocenjevanje parametrov v probit modelu}
 
 \subsubsection{Algoritem za probit model}
@@ -916,9 +1039,14 @@ V implementaciji smo popolnoma sledili zgoraj izpeljanim enačbam, zato jih tu n
 
 % slovar
 \section*{Slovar strokovnih izrazov}
-%\geslo{}{}
+
+\geslo{generalized linear model}{posplošeni linearni model}\\
+\geslo{score function}{funkcija zbira}\\
+\geslo{Fisher information matrix}{Fisherjeva informacijska matrika}\\
+\geslo{link function}{povezovalna funkcija}\\
+\geslo{maximum likelihood estimator (MLE)}{cenilka največjega verjetja}\\
+\geslo{exponential family}{eksponentna družina}
 %
-%\geslo{}{}
 %
 % seznam uporabljene literature
 %\begin{thebibliography}{99}
