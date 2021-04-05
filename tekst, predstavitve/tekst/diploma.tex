@@ -154,7 +154,7 @@ Koristno je tudi pogledati logaritem zgornje enačbe
 \begin{align}
     \log f_{Y}(y; \theta, \phi) &= \frac{y\theta - b(\theta)}{a(\phi)} + c(y,\phi) \\
     \frac{\partial}{\partial \theta} \log f_{Y}(y;\theta, \phi) &= V_{\theta}(y) = \frac{(y - b'(\theta))}{a(\phi)} \\
-    \frac{\partial^2}{\partial \theta^2}\ell &= -\frac{b''(\theta)}{a(\phi)},
+    \frac{\partial^2}{\partial \theta^2}\log f_{Y}(y; \theta, \phi) &= -\frac{b''(\theta)}{a(\phi)},
 \end{align}
 kjer funkcijo $V$ imenujemo tudi \textit{funkcija zbira}, oziroma v angleščini \textit{score function.}
 
@@ -201,7 +201,7 @@ in po zgoraj dokazani enakosti za funkcijo zbira torej velja
 Zgornja trditev nam torej pove, da lahko pričakovano vrednost in varianco porazdelitve iz eksponentne družine, z nekaj odvajanja, preberemo kar iz gostote - izognemo se integriraciji. Po drugi
 strani pa vidimo, da je varianca le funkcija pričakovane vrednosti. 
 
-Pričakovano vrednost kvadrata funkcije zbira v splošnem imenujemo \textit{Fisherjeva informacija}, $\mathrm{FI}(\theta) = E((V(Y))^2),$ izpeljano zvezo, ki poveže funkcijo zbira in njene odvode pa \textit{informacijska enakost.}
+Pričakovano vrednost kvadrata funkcije zbira v splošnem imenujemo \textit{Fisherjeva informacija}, $\mathrm{FI}(\theta) = \mathbb{E}((V(Y))^2),$ izpeljano zvezo, ki poveže funkcijo zbira in njene odvode pa \textit{informacijska enakost.}
 Uporabnost teh zvez bo postala jasna v sledečih poglavjih.
 
 Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
@@ -256,7 +256,7 @@ linearno, torej je sistematični del enak
 \]
 \subsubsection{Povezovalna funkcija}
 Tretji del posplošenega linearnega modela je \textit{povezovalna funkcija}, ta nam poda funkcijo $g(\cdot)$ med slučajno komponento
-in sistematičnim delom. Če označimo $\mu = E(Y)$, je
+in sistematičnim delom. Če označimo $\mu = \mathbb{E}(Y)$, je
 \[
     g(\mu) = \beta_{0} + x_{i1}\beta_{1} + x_{i2}\beta_{2} + \ldots + x_{ip}\beta_{p}
 \]
@@ -424,23 +424,23 @@ Zgornji funkciji rečemo \textit{sigmoida}. Iz njenega grafa je morda še bolj o
 
 Če izpeljane izraze za verjetnost upoštevamo v logaritemski funkciji verjetja dobimo
 \begin{align}
-    \ell(\beta) &= \sum_{i=1}^{n}\left( n_{i}\log{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  + y_{i}\log{\left( \frac{\frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}}}{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  \right)} \right) \nonumber\\
+    L(\beta) &= \sum_{i=1}^{n}\left( n_{i}\log{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  + y_{i}\log{\left( \frac{\frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}}}{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  \right)} \right) \nonumber\\
                 &= \sum_{i=1}^{n}\left( y_{i}(x_{i}^\top\beta) - n_{i}\log(1 + \exp{x_{i}^\top\beta})           \right)
 \end{align}
 Od tod vidimo, da je naša funkcija verjetja zares odvisna le od parametrov $\beta$,~vse ostalo nam je poznano. Da torej poiščemo maksimum in s tem
 cenilko največjega verjetja, funkcijo odvajamo in zbirno funkcijo enačimo z 0
 \[
-    \dot{\ell}(\beta) = \begin{bmatrix}
-                                 \frac{\partial \ell(\beta)}{\partial \beta_{0}} \\
-                                 \frac{\partial \ell(\beta)}{\partial \beta_{1}} \\
+    \frac{\partial}{\partial \beta} L = \begin{bmatrix}
+                                 \frac{\partial L(\beta)}{\partial \beta_{0}} \\
+                                 \frac{\partial L(\beta)}{\partial \beta_{1}} \\
                                  \vdots \\
-                                 \frac{\partial \ell(\beta)}{\partial \beta_{p}}
+                                 \frac{\partial L(\beta)}{\partial \beta_{p}}
                         \end{bmatrix}
 \]
 Pomembno je opaziti, da parametri $\beta$ vedno nastopajo ob pojasnjevalnih spremenljivkah linearno -- zato bodo komponente zbirne funkcije simetrične.
 J-ta komponenta bo tako enaka
 \begin{align}
-    \frac{\partial \ell(\beta)}{\partial \beta_{j}} &= \sum_{i=1}^{n} \left(x_{ij}(y_{i} - n_{i}p_{i}(\beta))   \right),~~j = 0,1,\ldots r,~~\text{kjer~smo~upoštevali} \\
+    \frac{\partial L(\beta)}{\partial \beta_{j}} &= \sum_{i=1}^{n} \left(x_{ij}(y_{i} - n_{i}p_{i}(\beta))   \right),~~j = 0,1,\ldots r,~~\text{kjer~smo~upoštevali} \\
     \frac{\partial}{\partial \beta_{j}}(x_{i}^\top\beta) &= \frac{\partial}{\partial \beta_{j}}\left(\beta_{0} + x_{i1}\beta_{1} + \ldots x_{ir}\beta_{r}\right) \nonumber\\
                                                     &= x_{ij},
 \end{align}
@@ -458,7 +458,7 @@ bomo kasneje pokazali, je zanjo potrebno izračunati še drugi odvod, zato to st
 \end{align}
 Vse sedaj skupaj sestavimo v
 \begin{align}
-    \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} \ell(\beta)= - \sum_{i}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right),~~j,k = 0,1,\ldots, r
+    \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} L(\beta)= - \sum_{i}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right),~~j,k = 0,1,\ldots, r
 \end{align}
 Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $var(Y_{i}) = v_{i}(\beta) = n_{i}p_{i}(1-p_{i}),$~kar vključimo v zgornjo enačbo in končno dobimo
 \begin{align}
@@ -478,12 +478,12 @@ Vektorsko definiramu tudi
 \]
 spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo %DOPOLNI KER NI NITI MALO JASNO OD KOD TO PRIDE
 \begin{align} \label{ell}
-    \ell(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
+    L(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
     &= y^\top\mathbf{X}\beta - n^\top \log(1 + \exp{\mathbf{X}\beta}),
 \end{align}
 in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
 \begin{equation}
-    \dot{\ell}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
+    \dot{L}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
 \end{equation}
 kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
 S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komponent in torej lahko zapišemo
@@ -492,7 +492,7 @@ S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komp
 \end{equation}
 in lahko končno vse povzamemo v
 \begin{align}\label{prvi}
-    \dot{\ell}(\beta) = \mathbf{X}^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
+    \dot{L}(\beta) = \mathbf{X}^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
 \end{align}
 Ostane nam le še dvojni odvod. Najprej si oglejmo
 \[
@@ -505,7 +505,7 @@ Ostane nam le še dvojni odvod. Najprej si oglejmo
 \]
 iz tega potem takoj sledi, da je
 \begin{equation} \label{drugi}
-    \ddot{\ell}(\beta) = -\mathbf{X}^\top v(\beta)\mathbf{X},
+    \ddot{L}(\beta) = -\mathbf{X}^\top v(\beta)\mathbf{X},
 \end{equation}
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 
@@ -1014,7 +1014,7 @@ torej $\beta_{0} = 15.04290$ in $\beta_{1} = -0.23216.$ Če graf narišemo, dobi
         
         \end{axis}
     \end{tikzpicture}
-    \caption{Izračunane verjetnosti}
+    \caption{Izračunane verjetnosti z eno pojasnjevalno spremenljivko}
     \label{fig:logit1}
     \end{figure}
     \end{center}
@@ -1022,6 +1022,11 @@ torej $\beta_{0} = 15.04290$ in $\beta_{1} = -0.23216.$ Če graf narišemo, dobi
 Vidimo da je sigmoida v tem primeru obrnjena drugače kot na sliki \ref{fig:sigmoid} - tak rezultat nam da negativen predznak parametra $\beta_{1}.$
 Sklepamo lahko torej da pri višjih temperaturah tesnila redkeje odpovejo.
 
+Enako rešimo še primer z dvema pojasnjevalnima spremenljivkama, pritisku in temperaturi. Rezultat je ploskev, saj nas zanima odpoved pri vsakem možnem
+paru temperature in pritiska. Izračunani parametri znašajo $\beta_{0} = 13.29236,~\beta_{1} = -0.22867,~\beta_{2} = -0.01040.$
+
+\begin{center}
+\begin{figure}
 \begin{tikzpicture}
     \begin{axis}
     \addplot3[
@@ -1031,6 +1036,9 @@ Sklepamo lahko torej da pri višjih temperaturah tesnila redkeje odpovejo.
     {exp(13.29236 -0.22867*x-0.01040*y)/(1+exp(13.29236 -0.22867*x-0.01040*y))};
     \end{axis}
 \end{tikzpicture}
+\caption{Izračunane verjetnosti z dvema pojasnjevalnima spremenljivkama}
+\end{figure}
+\end{center}
 \subsection{Ocenjevanje parametrov v probit modelu}
 
 \subsubsection{Algoritem za probit model}
