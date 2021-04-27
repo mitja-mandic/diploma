@@ -13,7 +13,7 @@ def varianca(vektor, skupine):
 def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin = [], zacetni_beta = [], epsilon=0.001):
     
     """
-    logistični model predpostavlja: logit(pi) = 1*beta_0 + x_i1*beta_1 + ... + x_ir*beta_r
+    logistični model predpostavlja: logit(p_i) = 1*beta_0 + x_i1*beta_1 + ... + x_ir*beta_r
     
     X je matrika teh koeficientov dimenzije: (n, r+1)
     vektor rezultatov so realizacije slučajnega vektorja, dimenzije: (n,)
@@ -73,7 +73,7 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
     while True:
         if iteracije - 1 > max_iteracij:
             return print('presegli ste stevilo iteracij')
-        #elif all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
+        
         elif all(np.abs(np.array(beta_star) - np.array(beta_nov)) < epsilon):
             break
         else:
@@ -94,7 +94,17 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
             beta_nov = beta_star + h
             #print(beta_nov)
             iteracije += 1
-    parametri = {'var-kovar' : var, 'parametri' : beta_nov, 'p':p}
-    #print(parametri)
+    #parametri = {'var-kovar' : var, 'parametri' : beta_nov, 'p':p}
+    parametri = {'parametri' : beta_nov, 'p':p}
+    print(iteracije)
     return parametri
 
+
+podatki = pd.read_csv("diploma\\koda\\podatki.txt")
+podatki['dodatna'] = 1
+matrika = podatki[['dodatna','TEMPERATURE','PRESSURE']].values
+vrednosti_y = podatki[['O_RING_FAILURE']].values
+#print(podatki[['dodatna']])
+#print(podatki.columns)
+resitev = izracunaj_koeficiente(20, matrika,vrednosti_y)
+print(resitev, "logit")

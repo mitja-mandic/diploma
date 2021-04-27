@@ -192,7 +192,7 @@ Spet uporabimo prej izpeljane zveze in dobimo
 \end{gather*}
 in po zgoraj dokazani enakosti za funkcijo zbira torej velja
 \begin{align*}
-    -\mathbb{E}\left(\frac{\partial^2}{\partial\theta^2}f_{Y}(y)\right) &= \mathbb{E}\left(V(Y)^2\right) \\
+    -\mathbb{E}\left(\frac{\partial^2}{\partial\theta^2}\log f_{Y}(y)\right) &= \mathbb{E}\left(V(Y)^2\right) \\
     -\frac{b''(\theta)}{a\phi} &= \frac{1}{a(\phi)^2}Var(Y) \\
     \mathrm{Var}(Y) &= -a(\phi)b''(\theta)
 \end{align*}
@@ -626,9 +626,96 @@ kjer binomski simbol izpustimo zaradi enostavnejšega pisanja. Zgornjo enačbo l
 \begin{equation}
     \log(F(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
 \end{equation}
-Enačbo zopet odvajamo po parametru $\beta,$ vendar se nam v tem primeru ne poenostavi kot z logistično funkcijo.
+Enačbo odvajamo po parametru $\beta,$ vendar se nam v tem primeru ne poenostavi kot z logistično funkcijo. Označimo s $ \phi = \frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}},$
+gostoto standardne normalne porazdelitve.
+\begin{align*}
+    \frac{\partial}{\partial\beta_{j}} L(\beta) &=
+    \frac{\partial}{\partial\beta_{j}} \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right) = \\
+    &= \sum_{i = 1}^{n}\left(\frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i^\top\beta})}x_{ij} - (m_{i}-y_{i})\frac{\phi(x_{i}^\top\beta)}{1-\Phi(x_{i^\top\beta})} x_{ij}  \right) = \\
+    &= \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i}}{\Phi(x_{i}^\top\beta)} - \frac{m_{i}-y_{i}}{1-\Phi(x_{i}^\top\beta)}\right) = \\
+    &= \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)
+\end{align*}
+Sistem enačb verjetja se torej glasi
+\begin{equation}
+    \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right) = 0,~~j=0,1,\ldots,r
+\end{equation}
+Te enačbe očitno niso rešljive analitično in se bomo zopet morali poslužiti numeričnih metod. Kot smo videli že pri izpeljavi enačb za logistično regresijo,
+ bomo za to potrebovali še druge odvode.
+\begin{multline*}
+    \frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}L(\beta) = \sum_{i = 1}^{n}x_{ij}\left(\frac{\partial}{\partial\beta_{k}}[\phi(x_{i}^\top\beta)]\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)\\
+    +\frac{\partial}{\partial\beta_{k}}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)\phi(x_{i}^\top\beta)
+\end{multline*}
+Izračunajmo najprej prvi člen
+\begin{align*}
+    \frac{\partial}{\partial\beta_{k}}\phi(x_{i}^\top\beta) &= \frac{\partial}{\partial\beta_{k}}\left(\frac{1}{\sqrt{2\pi}}e^{-\frac{(x_{i}^\top\beta)^2}{2}}\right) \\
+    &=\frac{-x_{i}^\top\beta}{\sqrt{2\pi}}e^{-\frac{(x_{i}^\top\beta)^2}{2}}x_{ik} \\
+    &= -x_{i}^\top\beta x_{ik}\phi(x_{i}^\top\beta).
+\end{align*}
+Drugi člen povzroča nekaj več preglavic.
+\begin{align}\label{drugiodv}
+    \frac{\partial}{\partial\beta_{k}}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right) &= 
+    \frac{-m_{i}\phi(x_{i}^\top\beta)x_{ik}\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)) - (y_{i}-m_{i})\nicefrac{\partial}{\partial\beta_{k}(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))}}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2}
+\end{align}
+Posebej izračunajmo še
+\begin{align*}
+    \frac{\partial}{\partial\beta_{k}}(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))) &= \phi_{x_{i}^\top\beta}x_{ik}(1-\Phi(x_{i}^\top\beta)) - \Phi(x_{i}^\top\beta)\phi(x_{i}^\top\beta)x_{ik}\\
+    &= \phi(x_{i}^\top\beta)x_{ik}(1-2\Phi(x_{i}^\top\beta))
+\end{align*}
+in vključimo to v enačbo \eqref{drugiodv}
+\begin{align*}
+    &\frac{-m_{i}\phi(x_{i}^\top\beta)\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))x_{ik} - (y_{i} - m_{i}\Phi(x_{i}^\top\beta))\phi(x_{i}^\top\beta)x_{ik}(1-2\Phi(x_{i}^\top\beta))}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2} \\
+    &\phi(x_{i}^\top\beta)x_{ik}\frac{2y_{i}\Phi(x_{i}^\top\beta) - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2}
+\end{align*}
+Vse skupaj povzemimo v
+\begin{align*} %NE VIDI SE VSEGA. POGTUNTAJ KAKO ZMANJŠAT FONT
+    \frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}L(\beta) &= \sum_{i = 1}^{n}x_{ij}\left(-x_{i}^\top\beta x_{ik} \phi(x_{i}^\top\beta)\frac{y_{i}-m_{i}}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}
+            +\phi(x_{i}^\top\beta)^2x_{ik}\frac{2y_{i} - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))^2}\right) \\
+    &= \sum_{i=1}^{n}x_{ij}\frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\left(\phi(x_{i}^\top\beta)\frac{2y_{i} - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))}
+    -(x_{i}^\top\beta)(y_{i}-m_{i}\Phi(x_{i}^\top\beta)) \right)x_{ik}
+\end{align*}
+
+Zopet je koristno enačbe zapisati v matrični obliki. Za funkcijo zbira definirajmo vektor faktorjev
+\[
+    s = \begin{bmatrix}
+        \phi(x_{1}^\top\beta)\frac{y_{1}-m_{1}\Phi(x_{1}^\top\beta)}{\Phi(x_{1}^\top\beta)(1-\Phi(x_{1}^\top\beta))} \\
+        \vdots \\
+        \phi(x_{n}^\top\beta)\frac{y_{n}-m_{n}\Phi(x_{n}^\top\beta)}{\Phi(x_{n}^\top\beta)(1-\Phi(x_{n}^\top\beta))} \\
+    \end{bmatrix}
+\]
+in tako funkcijo zbira poenostavimo v
+\[
+    \frac{\partial}{\partial\beta}L(\beta) = \mathbf{X}^\top s.
+\]
+
+Na podoben način se lotimo tudi Hessejeve matrike. Definiramo diagonalno matriko, kjer so na diagonali členi
+\[
+    h_{i} = \frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\left(\phi(x_{i}^\top\beta)\frac{2y_{i} - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))}
+    -(x_{i}^\top\beta)(y_{i}-m_{i}\Phi(x_{i}^\top\beta)) \right),
+\]
+torej $\mathbf{H} = diag(h_{1},\ldots,h_{n})$ in Hessejevo matriko zapišemo v preglednejši obliki
+\[
+    \frac{\partial^2}{\partial\beta^2} L(\beta) = \mathbf{X}^\top \mathbf{H X}
+\]
+Končno, Newtonova metoda za iskanje ničel funkcije zbira z uporabo vseh zgornjih oznak
+\begin{equation}
+    \beta_{i+1} = \beta_{i} - (\mathbf{X}^\top \mathbf{H X})^{-1}\mathbf{X}^\top s.
+\end{equation}
+
+%\[
+%    \begin{bmatrix}
+%        \frac{\phi(x_{1}^\top\beta)}{\Phi(x_{1}^\top\beta)(1-\Phi(x_{1}^\top\beta))}\left(\phi(x_{1}^\top\beta)\frac{2y_{1} - m_{1}\Phi(x_{1}^\top\beta)^2 - y_{1}}{(\Phi(1-\Phi(x_{1}^\top\beta)))}
+%    -(x_{1}^\top\beta)(y_{1}-m_{1}\Phi(x_{1}^\top\beta)) \right) & & &\\
+%    & \ddots & & \\
+%    & & & \frac{\phi(x_{n}^\top\beta)}{\Phi(x_{n}^\top\beta)(1-\Phi(x_{n}^\top\beta))}\left(\phi(x_{n}^\top\beta)\frac{2y_{n} - m_{n}\Phi(x_{n}^\top\beta)^2 - y_{n}}{(\Phi(1-\Phi(x_{n}^\top\beta)))}
+%    -(x_{n}^\top\beta)(y_{n}-m_{n}\Phi(x_{n}^\top\beta)) \right)
+%    \end{bmatrix}
+%\]
+
+
 
 \subsection{Ne-kanonični modeli v splošnem}
+
+\subsection{Obstoj rešitve enačb verjetja}
 
 \section{Numerične metode}
 V sledečih razdelkih si bomo od bliže pogledali nekaj numeričnih metod, uporabljenih v kasnejših zgledih. Te metode slonijo na stoletja starih
