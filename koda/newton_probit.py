@@ -25,7 +25,7 @@ def izracunaj_koeficiente_probit(max_iteracij, matrika, vektor_rezultatov,vektor
     
     def hessian_koef(y,m,x):
         phi = norm.cdf(x)
-        koef = np.divide(norm.pdf(x),(phi*(1-phi))) * ( norm.cdf(x) * np.divide((2*phi*y - m * (phi)**2 - y),phi*(1-phi))-x * (y-m * phi))
+        koef = np.divide(norm.pdf(x),(phi*(1-phi))) * ( norm.pdf(x) * np.divide((2*phi*y - m * (phi)**2 - y),phi*(1-phi))-x * (y-m * phi))
         return np.diag(koef)
 
 
@@ -64,8 +64,7 @@ def izracunaj_koeficiente_probit(max_iteracij, matrika, vektor_rezultatov,vektor
     zacetni_h = np.linalg.solve(zacetni_hessian,zacetni_score)
     
     beta_nov = beta_star + zacetni_h
-    print(beta_star)
-    print(beta_nov)
+
     while True:
         if iteracije - 1 > max_iteracij:
             return print('presegli ste stevilo iteracij')
@@ -89,12 +88,14 @@ def izracunaj_koeficiente_probit(max_iteracij, matrika, vektor_rezultatov,vektor
             #print(beta_nov)
             iteracije += 1
     parametri = {'parametri': beta_nov, 'p':p}
-    print(iteracije)
+    print(iteracije, "iteracij")
     return parametri
 
 podatki = pd.read_csv("diploma\\koda\\podatki.txt")
 podatki['dodatna'] = 1
 matrika = podatki[['dodatna','TEMPERATURE','PRESSURE']].values
+#matrika = podatki[['dodatna','TEMPERATURE']].values
+
 vrednosti_y = podatki[['O_RING_FAILURE']].values
 #print(podatki[['dodatna']])
 #print(podatki.columns)

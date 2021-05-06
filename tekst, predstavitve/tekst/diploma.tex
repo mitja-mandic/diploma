@@ -509,6 +509,73 @@ iz tega potem takoj sledi, da je
 \end{equation}
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 
+\subsection{Obstoj rešitve enačb verjetja v logističnem modelu}
+V prejšnjem odseku smo izpeljali enačbe verjetja za logistično regresijo in videli, da v splošnem niso analitično rešljive. Porodi pa se vprašanje,
+kdaj rešitev pravzaprav sploh obstaja? Izkaže se, da je obstoj in enoličnost rešitve v logističnem modelu moč dokazati iz podatkov. Sledeče poglavje temelji na članku
+\cite{albert1984existence}.
+
+Zopet bomo vpeljali nekaj novih oznak. Imejmo $n$ neodvisnih opazovanj vektorja dimenzije $p$ in določimo $(x,H),$ kjer je $x^\top = (x_{0},\ldots,x_{p}),x_{0}\equiv 1,$
+$H$ pa je spremenljivka, ki zavzame vrednosti $H_{1},\ldots,H_{g}$ in pokaže kateri skupini pripada določeno opazovanje. V našem primeru je $g=2$, $H_{1}$ ustreza Bernoullijevi
+enki, $H_{2}$ pa Bernoullijevi ničli.
+
+\subsubsection{Funkcija verjetja}
+Za potrebe tega poglavja vpeljimo novo notacijo za funkcijo verjetja
+\begin{equation}
+    \begin{aligned}
+    \mathbf{pr}(H_{s}|x) = \exp(\beta_{s}^\top x)\mathbf{pr}(H_{g}|x),~s=1,\ldots,g-1 \\
+    \mathbf{pr}(H_{g}|x) = \nicefrac{1}{\sum_{s=1}^{g}\exp(\beta_{s}^\top x)} \\
+    \beta_{s}^\top = (\beta_{s0},\ldots,\beta_{sp}),~s=1,\ldots,g-1,~\beta_{g}^\top=0
+    \end{aligned}
+\end{equation}
+Za ilustracijo si zopet poglejmo primer $g=2,$ enačbe verjetja potem izgledajo
+\begin{equation}
+    \begin{aligned}
+    \mathbf{pr}(H_{2}|x) = \frac{1}{\exp(\beta_{1}^\top x) + \exp{(\beta_{2}^\top x)}} = \frac{1}{1 + \exp(\beta^\top x)} \\
+    \mathbf{pr}(H_{1}|x) = \frac{\exp(\beta_{1}^\top x)}{1 + \exp(\beta_{1}^\top x)},\\
+    \end{aligned}
+\end{equation}
+kar se seveda sklada z enačbami iz prejšnjega poglavja.
+
+Potrebujemo še način za razvrščanje vektorjev v skupine. Vektor $x$ pripada skupini $H_{s}$ natanko tedaj, ko velja
+\[
+    (\beta_{s}-\beta_{t})^\top x \geq 0,~t=1,\ldots,g.
+\]
+Predpostavimo še, da je matrika opazovanj $X$, dimenzije $n\times(p+1),$ polnega ranga. Označimo z $E_{s}$ množico identifikatorjev vrstic matrike $X,$ ki pripadajo
+skupini $H_{s}.$
+Logaritemsko funkcijo verjetja v splošnem zapišemo kot
+\[
+    \log L (X,\beta) = \sum_{j=1}^{g}\sum_{i\in E_{j}}\log\left(\frac{1}{\sum_{t=1}^{g} \exp(\beta_{t}-\beta_{j})^\top x_{i}}\right)
+\]
+
+\subsubsection{Popolna separacija}
+Popolna separacija v podatkih je prisotna, če obstaja tak vektor $\beta$, da za vse $i\in E_{j}$ in $j,t = 1,\ldots,g,~j\neq t$ velja
+\[
+    (\beta_{j}-\beta_{k})^\top x_{i} > 0.
+\]
+Torej obstaja vektor $\beta,$ ki nam podatke popolnoma loči na skupine. 
+V primeru dveh skupin se pogoj prevede na $\beta^\top x_{i}>0, i\in E_{1}$ in $\beta^\top x_{i}<0, i\in E_{2}.$
+
+
+\begin{izrek}
+    Če je v podatkih prisotna popolna separacija, cenilka največjega verjetja $\hat{\beta}$ ne obstaja in velja
+    \[
+        \max_{\beta} L(X,\beta) = 1.
+    \]
+\end{izrek}
+
+\begin{proof}
+    a ga bomo?
+\end{proof}
+
+\subsubsection{Kvazi-popolna separacija}
+Kvazi-popolna separacija v podatkih je prisotna, če obstaja tak vektor $\beta$, da za vse $i\in E_{j}$ in $j,t = 1,\ldots,g,~j\neq t$ velja
+\[
+    (\beta_{j}-\beta_{k})^\top x_{i} \geq 0,
+\]
+pri čemer velja enakost za vsaj eno trojico $(i,j,t).$
+
+\subsubsection{Prekrivanje}
+
 \subsection{Kanonični modeli v splošnem}
 Kot bomo spoznali v sledečem razdelku, spada logistična regresija med tako imenovane modele s "'kanonično"` povezovalno funkcijo. 
 Za vpeljavo tega ter prenekaterih ostalih pojmov pa potrebujemo nekaj dodatne teorije.
@@ -714,8 +781,6 @@ Končno, Newtonova metoda za iskanje ničel funkcije zbira z uporabo vseh zgornj
 
 
 \subsection{Ne-kanonični modeli v splošnem}
-
-\subsection{Obstoj rešitve enačb verjetja}
 
 \section{Numerične metode}
 V sledečih razdelkih si bomo od bliže pogledali nekaj numeričnih metod, uporabljenih v kasnejših zgledih. Te metode slonijo na stoletja starih
@@ -999,11 +1064,11 @@ Povežimo vso izpeljano teorijo v algoritem za ocenjevanje parametrov modela obl
 \]
 torej kanoničnega logističnega modela.
 \begin{algorithm}[H]
-    \caption{\textbf{function} oceniParametre(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
+    \caption{\textbf{function} LogitModel(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
 \begin{algorithmic}
     
     %\COMMENT 
-    \STATE $p = \frac{\exp{(X^\top \beta_{star})}}{1 + \exp{(X^\top \beta_{star})}}$
+    \STATE $p = \frac{\exp{(X^\top \beta_{zacetni})}}{1 + \exp{(X^\top \beta_{zacetni})}}$
     \STATE $V = p(1 - p)$ 
     \STATE $Score = X^\top (Y - p)$ 
     \STATE $Info = X^\top V X$ 
@@ -1072,9 +1137,10 @@ spremenljivka - 1 označuje, da je tesnilo popustilo, 0 pa da je pogoje vzdržal
 \end{table}
 \end{center}
 
-Poženimo algoritem najprej le na podatkih o temperaturi. Ker imamo le eno pojasnjevalno spremenljivko uporabljamo torej model oblike
+Poženimo algoritem najprej le na podatkih o temperaturi. Za začetno vrednost približka $\beta$ vzemimo 0, natančnost $\epsilon$ pa si predipšemo na 0,001.
+Ker imamo le eno pojasnjevalno spremenljivko uporabljamo torej model oblike
 \[
-    \mathrm{logit}(p_{i}) = \beta_{0} + x_{i}\beta{1}
+    \mathrm{logit}(p_{i}) = \beta_{0} + x_{i}\beta_{1}
 \]
 Za izračun približka znotraj 1 tisočinke, z začetno vrednostjo $\beta = (0,0),$ smo potrebovali le nekaj korakov. Vstavimo v invertirano logit transformacijo in dobimo
 \[
@@ -1107,13 +1173,16 @@ torej $\beta_{0} = 15.04290$ in $\beta_{1} = -0.23216.$ Če graf narišemo, dobi
     \end{center}
 
 Vidimo da je sigmoida v tem primeru obrnjena drugače kot na sliki \ref{fig:sigmoid} - tak rezultat nam da negativen predznak parametra $\beta_{1}.$
-Sklepamo lahko torej da pri višjih temperaturah tesnila redkeje odpovejo.
+Sklepamo lahko torej da pri višjih temperaturah tesnila redkeje odpovejo. Za računanje smo si predpisali natančnost $\epsilon = 0,001,$ razlika med dvema zaporednima približkoma
+ne sme presegati te vrednosti. Z uporabo našega algoritma (ter vgrajenih funkcij za invertiranje matrik in reševanje sistemov enačb) smo do rešitve prišli v vsega štirih iteracijah.
 
 Enako rešimo še primer z dvema pojasnjevalnima spremenljivkama, pritisku in temperaturi. Rezultat je ploskev, saj nas zanima odpoved pri vsakem možnem
-paru temperature in pritiska. Izračunani parametri znašajo $\beta_{0} = 13.29236,~\beta_{1} = -0.22867,~\beta_{2} = -0.01040.$
-
+paru temperature in pritiska. Izračunani parametri znašajo $\beta_{0} = 13.29236,~\beta_{1} = -0.22867,~\beta_{2} = -0.01040.$ Prikazan je graf funkcije
+\[
+    \frac{e^{13.29236 -0.22867*x-0.01040*y}}{1+e^{(13.29236 -0.22867*x-0.01040*y)}}.
+\]
 \begin{center}
-\begin{figure}
+\begin{figure}[H]
 \begin{tikzpicture}
     \begin{axis}
     \addplot3[
@@ -1126,9 +1195,87 @@ paru temperature in pritiska. Izračunani parametri znašajo $\beta_{0} = 13.292
 \caption{Izračunane verjetnosti z dvema pojasnjevalnima spremenljivkama}
 \end{figure}
 \end{center}
+Zopet smo algoritem pognali na enakih začetnih vrednostih približka in zahtevane natančnosti, rešitev pa dobili po štirih iteracijah.
+
 \subsection{Ocenjevanje parametrov v probit modelu}
+Sedaj ponovimo postopek še s probit modelom. Zaradi neoptimizirane numerične metode pričakujemo večje število iteracij za doseženo želeno natančnost.
 
 \subsubsection{Algoritem za probit model}
+Najprej postavimo algoritem. Ta se idejno sicer ne bo bistveno razlikoval od tistega uporabljenega v prejšnjem odseku.
+\begin{algorithm}[H]
+    \caption{\textbf{function} ProbitModel(iteracije, X, Y, $\beta_{zacetni}$, $\epsilon$)}
+\begin{algorithmic}
+
+    \STATE $p = \Phi(X^\top \beta_{zacetni})$
+    \STATE $Score_{koef} = \frac{Y-p}{p*(1-p)} * \phi(X^\top \beta_{zacetni})$
+    \STATE $Score = X^\top Score_{koef}$
+
+    \STATE $Hess_{koef} = \frac{\phi(X^\top \beta_{zacetni})}{p*(1-p)} * \left(\phi(X^\top \beta_{zacetni})\frac{2*p*Y - p^2-Y}{p*(1-p)} - X(Y - p)\right)$
+    \STATE $H = X^\top Hess_{koef} X$
+        
+    \STATE \text{\textit{Reši sistem na h:}} $H * h = Score$
+    \STATE $\beta_{star} = \beta_{zacetni}$
+    \STATE $\beta_{nov} = \beta_{star} - h$
+    \WHILE{$i \leq \text{iteracije}$}
+        
+        \IF{$\beta_{nov} - \beta_{star} \geq \epsilon$}
+            \STATE $p = \Phi(X^\top \beta_{nov})$
+            \STATE $Score_{koef} = \frac{Y-p}{p*(1-p)} * \phi(X^\top \beta_{nov})$
+            \STATE $Score = X^\top Score_{koef}$
+            
+            \STATE $Hess_{koef} = \frac{\phi(X^\top \beta_{nov})}{p*(1-p)} * \left(\phi(X^\top \beta_{nov})\frac{2*p*Y - p^2-Y}{p*(1-p)} - X(Y - p)\right)$
+            \STATE $H = X^\top Hess_{koef} X$
+            \STATE \text{\textit{Razreši na h:}}
+            \STATE $H * h = Score$ 
+            \STATE $\beta_{star} = \beta_{nov}$ 
+            \STATE $\beta_{nov} = \beta_{star} - h$ 
+        \ELSE
+        \STATE \text{\textit{Dosegli smo želeno natančnost v zadostnem številu korakov}}
+        \RETURN $\beta_{nov}$
+        \ENDIF
+        
+    \ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+Ponovimo postopek in za oceno le z eno pojasnjevalno spremenljivko, po vsega petih iteracijah dobimo $\beta_{0} = 8.77495,~\beta_{1} = -0.13510$ in funkcijo
+\[
+    \frac{e^{8.77495--0.13510x}}{1+e^{8.77495-0.13510x}}.
+\]
+Za vključeni obe spremenljivki pa $\beta_{0} = 8.08004,~\beta_{1} = -0.13774,~\beta_{2} = -0.006014$
+
+\subsection{Primerjava logit in probit modela}
+Zanimivejše kot le naštevanje parametrov, pa je primerjanje dobljenih številk. 
+\begin{center}
+    \begin{figure}[H]
+    \begin{tikzpicture}
+        \begin{axis}[
+            axis lines = center,
+            %xtick = {-10,-9,-8,...,9,10}
+            ytick = {0,0.1,0.2,...,1,1.1,1.2,1.3,1.4},
+            %ylabel = verjetnost,
+            %y label style = {at={(axis description cs:0.25,.5)},rotate=90}%,anchor=south}
+        ]
+        \addplot [
+            domain=30:100, 
+            samples=100, 
+            color=black,
+            ]
+            {exp(15.04290 - (0.23216 * x))/(1 + exp(15.04290 - (0.23216 * x)))};
+        \addplot[
+            domain=30:100, 
+            samples=100,
+            color = red,
+            ]
+            {exp(8.77495 - (0.13510 * x))/(1 + exp(8.77495 - (0.13510 * x)))};
+        %\addlegendentry{$x^2 + 2x + 1$}
+        \addlegendentry{logit}
+        \addlegendentry{probit}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Izračunane verjetnosti z eno pojasnjevalno spremenljivko}
+    \label{fig:logit1}
+    \end{figure}
+    \end{center}
 
 
 

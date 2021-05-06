@@ -96,13 +96,14 @@ def izracunaj_koeficiente(max_iteracij, matrika, vektor_rezultatov,vektor_skupin
             iteracije += 1
     #parametri = {'var-kovar' : var, 'parametri' : beta_nov, 'p':p}
     parametri = {'parametri' : beta_nov, 'p':p}
-    print(iteracije)
+    print(iteracije,"iteracije")
     return parametri
 
 
 podatki = pd.read_csv("diploma\\koda\\podatki.txt")
 podatki['dodatna'] = 1
-matrika = podatki[['dodatna','TEMPERATURE','PRESSURE']].values
+#matrika = podatki[['dodatna','TEMPERATURE','PRESSURE']].values
+matrika = podatki[['dodatna','TEMPERATURE']].values
 vrednosti_y = podatki[['O_RING_FAILURE']].values
 #print(podatki[['dodatna']])
 #print(podatki.columns)
