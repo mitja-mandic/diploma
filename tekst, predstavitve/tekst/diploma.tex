@@ -116,38 +116,57 @@ Ljubljana, \letnica}
 {\sc Povzetek}
 \end{center}
 % tekst povzetka v slovenscini
-V delu obravnavamo numerične metode, ki se uporabljajo pri računanju cenilk največjega verjetja v posplošenih linearnih modelih. Za uvod si postavimo teoretične 
-temelje z eksponentno družino, nato pa natančneje spoznamo logistični in probit model, za katera tudi izpeljemo enačbe verjetja. Dobljene enačbe komentiramo tudi v splošnem
-in komentiramo, zakaj je smiselno uporabljatii t.i. kanonične modele. V delu, namenjem numeričnim metodam, najprej navedemo in dokažemo nekaj dejstev o Newtonovi metodi za računanje
-ničel funkcij, ki jo nato prilagodimo za iskanje ekstremov funkcij verjetja. Vse zaključke preizkusimo in komentiramo tudi na praktičnih primerih.
+V nalogo smo se spustili z namenom razumeti postopek ocenjevanja parametrov v posplošenih linearnih modelih. Za uvod si postavimo teoretične 
+temelje z eksponentno družino in izpeljemo nekaj lastnosti. Nato definiramo posplošene linearne modele in si ogledamo nekaj najpomembenjših primerov
+ter predstavimo metode za ocenjevanje parametrov, s povdarkom na metodi največjega verjetja. Izpeljemo enačbe verjetja za logistični model, rezultate
+nato komentiramo v luči eksponentne družine in jih posplošimo za vse porazdelitve, ki ji pripadajo.
+Izpeljemo tudi enačbe verjetja v probit modelu in vidimo prednosti uporabe kanoničnih povezovalnih funkcij. 
+V drugem delu naloge se posvetimo numeričnim metodam. Izpeljemo Newtonovo metodo in komentiramo težave, ki lahko nastopijo z njeno uporabo. Definiramo tudi Fisher-scoring algoritem
+in dokažemo, da se ob uporabi modela s kanonično povezovalno funkcijo ujema z Newtonovo metodo.
 
+Izpeljano teorijo v zadnjem delu povežemo v praktičnem primeru. Primerjamo rezultate dobljene s probit in logističnim modelom in komentiramo morebitne razlike.
 \vfill
 \begin{center}
 {\bf Iterative numerical methods in generalized linear models}\\[3mm] % prevod slovenskega naslova dela
 {\sc Abstract}
 \end{center}
-% tekst povzetka v anglescini
+We have conducted the following research in order to understand the process of parameter estimation in generalized linear models. In the beginning we lay theoretical
+foundations with exponential family and derive some of it's properties. Then we define generalized linear models, inspect some more important cases and define multiple
+methods for parameter estimation, taking a closer look at the maximum likelihood method. We go on to derive maximum likelihood equations in the logistic model and generalize the 
+result for the exponential family. As an alternative, we derive the same equations also for the probit model and comment on the advantages of using canonical link functions.
+The second part focuses on numerical methods. We derive the Newton method and comment on it's possible issues. We also define the Fisher's scoring algorithm and prove 
+the equivalence of the methods for canonical distribution models.
 
-
+Theory is then put to work in the last part of the research. We compare probit and logit models and comment on the differences between the two.
 \vfill\noindent
 {\bf Math. Subj. Class. (2010):} navedi vsaj eno klasifikacijsko oznako -- dostopne so na \url{www.ams.org/mathscinet/msc/msc2010.html}  \\[1mm]
-{\bf Klju"cne besede:} navedi nekaj klju"cnih pojmov, ki nastopajo v delu  \\[1mm]
-{\bf Keywords:} angle"ski prevod klju"cnih besed
+{\bf Klju"cne besede:} eksponentna družina, kanonični parameter, cenilka največjega verjetja, logistični model, Fisher-scoring algoritem  \\[1mm]
+{\bf Keywords:} exponential family, canonical parameter, maximum likelihood estimator, logistic model, Fisher's scoring algorithm
 \pagebreak
 
 
 
 % tu se zacne besedilo seminarja
 \section{Uvod}
-V sodobnem svetu neomejenih podatkov, je njihovo obvladanje in koristno uporabljanje ključnega pomena. Velikokrat relacije med njimi niso vidne na 
-prvi pogled, a zato niso nič manj pomembne. Posplošeni linearni modeli so orodje, s katerimi te povezave modeliramo in jih poskušamo razumeti. So ena osnovnih
-metod statističnga raziskovanja. Vendar pa najenostavnejši modeli niso nujno najboljši in z zahtevnostjo naraste tudi problematika računanja. Tu pa nam na
-pomoč priskočijo numerične metode, ki pa morajo biti dovolj robustne in hkrati čim enostavnejše za računanje.
+Kaj natanko se zgodi v računalniškem ozadju, ko v programskem paketu poženemo ukaz za izračun koeficientov največjega verjetja? Kateri algoritmi se uporabljajo in 
+ali lahko kdaj naletimo na težave? V sodobnem svetu neomejene količine podatkov so stabilni in učinkoviti postopki za njihovo obdelavo izjemnega pomena. Potrebno je najti
+ravnovesje med kompleksnostjo algoritma in računsko zahtevnostjo. S tem in podobnimi vprašanji se srečamo v analizi numeričnih metod za posplošene linearne modele.
+V delu najprej natančno postavimo teoretične temelje, začenši z eksponentno družino in njenimi lastnostmi in zgledi. Nato predstavimo linearno regresijo kot alternativno metodo
+za računanje koeficientov cenilk, podrobneje pa izpeljemo enačbe verjetja v logističnem in probit modelu. 
 
-V delu si bomo najprej ogledali linearni model, natančneje pa spoznali dva glavna modela za obdelavo podatkov, kjer so odgovori 0 ali 1 - binarnih podatkov, to sta 
-\textit{logistični} in \textit{probit model}, uporabna za računanje verjetnosti dogodgkov. Za njihovo uporabo bomo razvili numerične algoritme in jih na koncu
-preizkusili na podatkih o odpovedih tesnil vesoljskih poletov pred dobo \textit{Challengerja.}
+V sledečih poglavjih izpeljemo numerične metode - Newtonovo metodo po korakih izpeljemo in komentiramo njene prednosti in slabosti ter jo nadgradimo v Fisher-scoring algoritem,
+ki ga tudi implementiramo in rezultate predstavimo v zadnjem poglavju.
 
+
+%V sodobnem svetu neomejenih podatkov, je njihovo obvladanje in koristno uporabljanje ključnega pomena. Velikokrat relacije med njimi niso vidne na 
+%prvi pogled, a zato niso nič manj pomembne. Posplošeni linearni modeli so orodje, s katerimi te povezave modeliramo in jih poskušamo razumeti. So ena osnovnih
+%metod statističnga raziskovanja. Vendar pa najenostavnejši modeli niso nujno najboljši in z zahtevnostjo naraste tudi problematika računanja. Tu pa nam na
+%pomoč priskočijo numerične metode, ki pa morajo biti dovolj robustne in hkrati čim enostavnejše za računanje.
+%
+%V delu si bomo najprej ogledali linearni model, natančneje pa spoznali dva glavna modela za obdelavo podatkov, kjer so odgovori 0 ali 1 - binarnih podatkov, to sta 
+%\textit{logistični} in \textit{probit model}, uporabna za računanje verjetnosti dogodgkov. Za njihovo uporabo bomo razvili numerične algoritme in jih na koncu
+%preizkusili na podatkih o odpovedih tesnil vesoljskih poletov pred dobo \textit{Challengerja.}
+%
 \section{Eksponentna družina} 
 Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
 pri posploševanju rezultatov. Slučajna spremenljivka $Y$ torej pripada \textit{enoparametrični eksponentni družini z disperzijskim parametrom,} če je njegova gostota glede na neko 
@@ -535,7 +554,6 @@ iz tega potem takoj sledi, da je
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 
 \subsection{Obstoj rešitve enačb verjetja v logističnem modelu}
-\textit{To poglavje je še nepopolno, moram razmisliti kaj vključiti.}
 
 V prejšnjem odseku smo izpeljali enačbe verjetja za logistično regresijo in videli, da v splošnem niso analitično rešljive. Porodi pa se vprašanje,
 kdaj rešitev pravzaprav sploh obstaja? Izkaže se, da je obstoj in enoličnost rešitve v logističnem modelu moč dokazati iz podatkov. Sledeče poglavje temelji na članku
@@ -629,13 +647,18 @@ bodisi Bernoullijevi ničli.
 
 \subsubsection{Nepopolna separacija}
 Nepopolna separacija v podatkih je prisotna, če obstaja tak vektor $\beta$, da za vse $i\in E_{j}$ in $j,t = 1,\ldots,g,~j\neq t$ velja
-\[
+\begin{equation}\label{nepopolnaSep}
     (\beta_{j}-\beta_{k})^\top x_{i} \geq 0,
-\]
+\end{equation}
 pri čemer velja enakost za vsaj eno trojico $(i,j,t).$
 
 Kot je omenjeno že zgoraj, v tem primeru podatke lahko popolnoma ločimo, a nekatri ležijo popolnoma na meji. Lahko pa se zgodi, da je podatke možno ločiti na več načinov. V spodnjih
 slikah sta obravnavana oba primera - ko imamo eno samo ločnico in ko jih je možno najti več.
+
+Poglejmo si primer, ko je $g=2$. Označimo s $Q(\beta)$ tiste podatke, ki zadoščajo enakosti v \eqref{nepopolnaSep} in recimo da je takih $r \neq 0$. Naj bo 
+$X^{q}$ matrika teh opažanj dimenzij $r\times(p+1).$ Velja $X^{q}\beta=0,$ torej so vrstice v $X^{q}$ linearno odvisne in pripadajo podprostoru dimenzije $d \leq p-1$.
+Velja tudi $d = rang(X^{q}) - 1.$ Če je $rang(X^{q}) = p$ je torej ločnica med podatki enolična, kot v sliki \ref{fig:enolicna}, sicer pa je takih ločnic lahko več, kot vidimo v
+sliki \ref{fig:neenolicna}.
 \begin{center}
     \begin{figure}[h!]
     \begin{tikzpicture}
@@ -657,11 +680,36 @@ slikah sta obravnavana oba primera - ko imamo eno samo ločnico in ko jih je mo�
     
     \end{tikzpicture}
     \caption{Nepopolna separacija, prvi primer}
+    \label{fig:enolicna}
 \end{figure}
 \end{center}
-%MANJKA PRIMER KO IMAŠ VEČ LOČNIC
 
+\begin{center}
+    \begin{figure}%[h!]
+    \begin{tikzpicture}
+    \draw (0,4) -- (0,0) -- (4,0);
+    \draw[dashed] (3.75,0.25) -- (0.25,3.75);
+    \draw[dashed] (1,3.75) -- (3,0.25);
+    \draw[dashed] (0.5,2.75) -- (3.75,1.125);
 
+    %\filldraw[black] (2.2,0.8) circle (2pt);
+    \filldraw[black] (1,3) circle (2pt);
+    \filldraw[black] (2,2) circle (2pt);
+    \filldraw[black] (0.5,1.45) circle (2pt);
+    \filldraw[black] (1,0.5) circle (2pt);
+    \filldraw[black] (3,0.25) circle (2pt);
+    
+    \filldraw[red] (3,1) circle (2pt);
+    \filldraw[red] (1.6,3.2) circle (2pt);
+    \filldraw[red] (3.5,1.25) circle (2pt);
+    \filldraw[red] (2.8,2.8) circle (2pt);
+    
+    \end{tikzpicture}
+    \caption{Nepopolna separacija, drugi primer}
+    \label{fig:neenolicna}
+\end{figure}
+\end{center}
+\pagebreak
 \subsubsection{Prekrivanje}
 Če je v podatkih prisotno prekrivanje, torej ne padejo v nobeno od prejšnjih dveh kategorij, je sistem enačb verjetja rešljiv enolično.
 \begin{center}
@@ -688,10 +736,6 @@ slikah sta obravnavana oba primera - ko imamo eno samo ločnico in ko jih je mo�
 \end{figure}
 \end{center}
 Vidimo, da v tem primeru podatkov ni možno razdeliti na dve ločeni skupini
-
-
-\subsubsection{Ugotavljanje separacije}
-
 
 \subsection{Kanonični modeli v splošnem}
 Kot bomo spoznali v sledečem razdelku, spada logistična regresija med tako imenovane modele s "'kanonično"` povezovalno funkcijo. 
@@ -932,7 +976,7 @@ ne da $L(\theta_{n}) < L(\theta_{n+1}).$ Mi pa bi želeli algoritem, ki bo konve
 Težavo z računanjem inverza rešimo tako, da namesto invertiranja problem prevedemo na reševanje sistema enačb za premik:
 \begin{align}\label{newtoneq}
     x_{n + 1} &= x_{n} + p_{n} \nonumber\\
-    \nabla^2L(\theta_{n})p_{n} &= -\nabla L(\theta_{n})
+    \frac{\partial^2}{\partial\theta^2}L(\theta_{n})p_{n} &= -\frac{\partial}{\partial\theta} L(\theta_{n})
 \end{align}
 Zadnji vrstici v \eqref{newtoneq} rečemo tudi \textit{Newtonova enačba}.
 Radi bi še dosegli, da bi se Newtonov algoritem premikal v eno smer, torej naraščal ali padal. S tem bi vedeli, kaj se bo zgodilo v iteraciji in lažje predvideli morebitne
@@ -941,11 +985,11 @@ njen drugi odvod pozitiven, oziroma v primeru funkcij več spremenljivk, kjer je
 strogo pozivino definitno matriko, bi bil ta optimizacijski problem konveksen in kot tak rešljiv globalno (veljati morajo še pogoji Karush-Kuhn-Tuckerja, vendar je to skoraj vedno res).
 Imejmo torej v točki $x^{*}$ pozitivno definitno Hessejevo matriko $H.$~Zapišimo Taylorjev polinom druge stopnje okoli te točke
 \[
-    f(x^{*} + s) = f(x_x^{*}) + \nabla f(x^{*})s + \frac{1}{2}s^\top H(x^{*})s.
+    f(x^{*} + s) = f(x_x^{*}) + \frac{\partial}{\partial\theta} f(x^{*})s + \frac{1}{2}s^\top \frac{\partial^2}{\partial\theta^2}f(x^{*})s.
 \]
-Če velja še pogoj prvega reda, torej $\nabla f(x^{*}) = 0,$~imamo
+Če velja še pogoj prvega reda, torej $\frac{\partial}{\partial\theta} f(x^{*}) = 0,$~imamo
 \[
-    f(x^{*} + s) = f(x^{*}) + \frac{1}{2}s^\top H(x^{*})s,
+    f(x^{*} + s) = f(x^{*}) + \frac{1}{2}s^\top \frac{\partial^2}{\partial\theta}f(x^{*})s,
 \]
 kar pomeni, da se vrednost funkcije vedno poveča, če se premaknemo iz stacionarne točke $x^{*}$~(drugi člen je vedno pozitiven zaradi pozitivne definitnosti)
 Tako vidimo, da imamo strogo padajoč algoritem.
@@ -1164,14 +1208,14 @@ Fisher scoring algoritem je po zgornjih oznakah
 Spomnimo se zaključkov poglavja \ref{kan}. Tam smo dokazali, da za modele s kanonično povezovalno funkcijo velja $\mathbb{E}(\frac{\partial^2}{\partial\theta^2}L) = \frac{\partial^2}{\partial\theta^2},$
 po informacijski enakosti pa velja 
 \begin{equation*}
-    \mathrm{FI}(\theta) = \mathbb{E}\left((\nabla L)(\nabla L)^\top\right) = \mathbb{E}(\frac{\partial^2}{\partial\theta^2}L) = \frac{\partial^2}{\partial\theta^2}L \\
+    \mathrm{FI}(\theta) = \mathbb{E}\left((\frac{\partial}{\partial\theta} L)(\frac{\partial}{\partial\theta} L)^\top\right) = \mathbb{E}(\frac{\partial^2}{\partial\theta^2}L) = \frac{\partial^2}{\partial\theta^2}L \\
     \rightarrow \mathrm{FI}(\theta) = \frac{\partial^2}{\partial\theta^2}L,
 \end{equation*}
 torej Fisherjeva informacija je za kanonične modele enaka Hessejevi matriki logaritemske funkcije verjetja! Poleg tega pa velja še
 \begin{align}
-    \mathrm{FI}(\theta) &= \mathrm{E}[(\nabla L(\theta))(\nabla L(\theta))^\top] \nonumber\\
-    &= \mathrm{E}[\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)\left(\nabla L(\theta) - \mathrm{E}[\nabla L(\theta)]\right)^\top] \nonumber \\
-    &= \mathrm{Var}[\nabla L(\theta)],
+    \mathrm{FI}(\theta) &= \mathrm{E}[(\frac{\partial}{\partial\theta} L(\theta))(\frac{\partial}{\partial\theta} L(\theta))^\top] \nonumber\\
+    &= \mathrm{E}[\left(\frac{\partial}{\partial\partial\theta} L(\theta) - \mathrm{E}[\frac{\partial}{\partial\theta} L(\theta)]\right)\left(\frac{\partial}{\partial\theta} L(\theta) - \mathrm{E}[\frac{\partial}{\partial\theta} L(\theta)]\right)^\top] \nonumber \\
+    &= \mathrm{Var}[\frac{\partial}{\partial\theta} L(\theta)],
 \end{align}
 variančno kovariančne matrike pa so pozitivno semidefinitne, kar pomeni da imamo konstanten algoritem.
 
@@ -1182,12 +1226,12 @@ odvodov in pridobimo pozitivno semidefinitno matriko v imenovalcu. Koristi upora
 \subsubsection{Fisher's scoring v logističnem modelu}
 Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
 \[
-    \mathrm{FI}(\theta) = \mathbb{E}[-\nabla ^2 L(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\nabla ^2 L(\theta),
+    \mathrm{FI}(\theta) = \mathbb{E}[-\frac{\partial^2}{\partial\theta^2} L(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\frac{\partial^2}{\partial\theta^2} L(\theta),
 \]
 kjer smo seveda uporabili tudi prej dokazano informacijsko enakost. Tako vidimo, da Fisher's scoring in Newton--Raphsonova metoda v primeru logistične regresije
 res sovpadata, saj je matrika drugih odvodov ravno enaka informacijski matriki. Če zapišemo sedaj vse skupaj
 \begin{align}
-    \hat{\theta}_{i+1} &= \hat{\theta}_{i} - (\nabla^{2} L(\hat{\theta}_{i}))^{-1} \nabla L(\hat{\theta}_{i}) \nonumber \\
+    \hat{\theta}_{i+1} &= \hat{\theta}_{i} - (\frac{\partial^2}{\partial\theta^2} L(\hat{\theta}_{i}))^{-1} \frac{\partial}{\partial\theta} L(\hat{\theta}_{i}) \nonumber \\
     &= \hat{\theta}_{i} + (\mathbf{X}^\top v(\hat{\theta}_{i}) \mathbf{X})^{-1}\mathbf{X}^\top(y - \mu(\hat{\theta}_{i})) 
 \end{align}
 
