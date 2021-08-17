@@ -118,11 +118,11 @@ Ljubljana, \letnica}
 % tekst povzetka v slovenscini
 V nalogo smo se spustili z namenom razumeti postopek ocenjevanja parametrov v posplošenih linearnih modelih. Za uvod si postavimo teoretične 
 temelje z eksponentno družino in izpeljemo nekaj lastnosti. Nato definiramo posplošene linearne modele in si ogledamo nekaj najpomembenjših primerov
-ter predstavimo metode za ocenjevanje parametrov, s povdarkom na metodi največjega verjetja. Izpeljemo enačbe verjetja za logistični model, rezultate
-nato komentiramo v luči eksponentne družine in jih posplošimo za vse porazdelitve, ki ji pripadajo.
-Izpeljemo tudi enačbe verjetja v probit modelu in vidimo prednosti uporabe kanoničnih povezovalnih funkcij. 
-V drugem delu naloge se posvetimo numeričnim metodam. Izpeljemo Newtonovo metodo in komentiramo težave, ki lahko nastopijo z njeno uporabo. Definiramo tudi Fisher-scoring algoritem
-in dokažemo, da se ob uporabi modela s kanonično povezovalno funkcijo ujema z Newtonovo metodo.
+ter predstavimo metode za ocenjevanje parametrov, s poudarkom na metodi največjega verjetja. Izpeljemo enačbe verjetja za logistični model, rezultate
+nato komentiramo v luči eksponentne družine in jih posplošimo na vse porazdelitve, ki ji pripadajo.
+Izpeljemo tudi enačbe verjetja v probit modelu in opazimo prednosti uporabe kanoničnih povezovalnih funkcij. 
+V drugem delu naloge se posvetimo numeričnim metodam. Izpeljemo Newtonovo metodo in komentiramo težave, ki lahko nastopijo z njeno uporabo. 
+Izpeljemo tudi Fisherjevo zbirno metodo in dokažemo, da se ob uporabi modela s kanonično povezovalno funkcijo ujema z Newtonovo metodo.
 
 Izpeljano teorijo v zadnjem delu povežemo v praktičnem primeru. Primerjamo rezultate dobljene s probit in logističnim modelom in komentiramo morebitne razlike.
 \vfill
@@ -148,28 +148,18 @@ Theory is then put to work in the last part of the research. We compare probit a
 
 % tu se zacne besedilo seminarja
 \section{Uvod}
-Kaj natanko se zgodi v računalniškem ozadju, ko v programskem paketu poženemo ukaz za izračun koeficientov največjega verjetja? Kateri algoritmi se uporabljajo in 
+Kaj natanko se zgodi v računalniškem ozadju, ko v programskem paketu poženemo ukaz za oceno parametrov po metodi največjega verjetja? Kateri algoritmi se uporabljajo in 
 ali lahko kdaj naletimo na težave? V sodobnem svetu neomejene količine podatkov so stabilni in učinkoviti postopki za njihovo obdelavo izjemnega pomena. Potrebno je najti
 ravnovesje med kompleksnostjo algoritma in računsko zahtevnostjo. S tem in podobnimi vprašanji se srečamo v analizi numeričnih metod za posplošene linearne modele.
 V delu najprej natančno postavimo teoretične temelje, začenši z eksponentno družino in njenimi lastnostmi in zgledi. Nato predstavimo linearno regresijo kot alternativno metodo
-za računanje koeficientov cenilk, podrobneje pa izpeljemo enačbe verjetja v logističnem in probit modelu. 
+za računanje ocen parametrov, podrobneje pa izpeljemo enačbe verjetja v logističnem in probit modelu. 
 
-V sledečih poglavjih izpeljemo numerične metode - Newtonovo metodo po korakih izpeljemo in komentiramo njene prednosti in slabosti ter jo nadgradimo v Fisher-scoring algoritem,
-ki ga tudi implementiramo in rezultate predstavimo v zadnjem poglavju.
+V sledečih poglavjih izpeljemo numerične metode, po korakih izpeljemo Newtonovo metodo in komentiramo njene prednosti in slabosti ter jo nadgradimo v Fisherjevo zbirno metodo,
+ki jo tudi implementiramo in rezultate predstavimo v zadnjem poglavju.
 
-
-%V sodobnem svetu neomejenih podatkov, je njihovo obvladanje in koristno uporabljanje ključnega pomena. Velikokrat relacije med njimi niso vidne na 
-%prvi pogled, a zato niso nič manj pomembne. Posplošeni linearni modeli so orodje, s katerimi te povezave modeliramo in jih poskušamo razumeti. So ena osnovnih
-%metod statističnga raziskovanja. Vendar pa najenostavnejši modeli niso nujno najboljši in z zahtevnostjo naraste tudi problematika računanja. Tu pa nam na
-%pomoč priskočijo numerične metode, ki pa morajo biti dovolj robustne in hkrati čim enostavnejše za računanje.
-%
-%V delu si bomo najprej ogledali linearni model, natančneje pa spoznali dva glavna modela za obdelavo podatkov, kjer so odgovori 0 ali 1 - binarnih podatkov, to sta 
-%\textit{logistični} in \textit{probit model}, uporabna za računanje verjetnosti dogodgkov. Za njihovo uporabo bomo razvili numerične algoritme in jih na koncu
-%preizkusili na podatkih o odpovedih tesnil vesoljskih poletov pred dobo \textit{Challengerja.}
-%
-\section{Eksponentna družina} 
-Za uvod v nalogo si najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
-pri posploševanju rezultatov. Slučajna spremenljivka $Y$ torej pripada \textit{enoparametrični eksponentni družini z disperzijskim parametrom,} če je njegova gostota glede na neko 
+\section{Eksponentna družina}\label{eksponentnaDruzina}
+Za uvod v nalogo najprej definirajmo osnovo, na kateri bo kasneje temeljil eden glavnih zaključkov naloge. Predvsem nam bodo zaključki poglavja pomagali
+pri posploševanju rezultatov. Slučajna spremenljivka $Y$ torej pripada \textit{enoparametrični eksponentni družini z disperzijskim parametrom,} če je njena gostota glede na neko 
 $\sigma-$končno mero oblike 
 \begin{equation}
     f_{Y}(y; \theta, \phi) = \exp{\left(\frac{y\theta - b(\theta)}{a(\phi)} + c(y, \phi)\right)},
@@ -203,7 +193,7 @@ Za dokaz prve enakosti si poglejmo
 saj je $f_{Y}(y)$ gostota. V zgornji in sledečih zvezah bomo namesto $f_{Y}(y;\theta,\phi),$ kjer to ne bo vodilo v dodatne težave, pisali kar $f_{Y}(y)$
 Od tu sledi
 \begin{align*}
-    \mathbb{E}(V(y)) &= \mathbb{E}(\frac{Y - b'(\theta)}{a(\phi)}) = 0 \\
+    \mathbb{E}(V(Y)) &= \mathbb{E}(\frac{Y - b'(\theta)}{a(\phi)}) = 0 \\
     \mathbb{E}(Y) &= b'(\theta)
 \end{align*}
 Za drugo pa si oglejmo
@@ -250,7 +240,7 @@ Oglejmo si sedaj nekaj primerov porazdelitev eksponentne družine:
 
     \item \textbf{Binomska porazdelitev.} Imejmo binomsko porazdeljeno slučajno spremenljivko $Y \sim \mathrm{Bin}(n,p).$ Izrazimo 
     \[
-        \mathrm{P}(Y = y) = \binom{n}{y}p^y(1-p)^{n-y} = \exp\left(y\log(\frac{p}{1-p}) + n\log(1-p) + \log{\binom{n}{k}}\right),
+        \mathrm{P}(Y = y) = \binom{n}{y}p^y(1-p)^{n-y} = \exp\left(y\log(\frac{p}{1-p}) + n\log(1-p) + \log{\binom{n}{y}}\right),
     \]
     od koder direktno sledi
     \[
@@ -271,14 +261,17 @@ eksponentne družine z disperzijskim parametrom.
 \subsubsection{Slučajni del}
 \textit{Slučajni del} privzame porazdelitev slučajnega vektorja $Y$, pri čemer privzemamo tudi neodvisnost komponent. Porazdelitev $Y$
 privzemamo odvisno od podatkov; mnogokrat je ,,binarna``, torej ima dve možni vrednosti - ,,uspeh`` ali ,,neuspeh``. Splošneje je lahko izid tudi 
-število uspehov v fiksnem številu poskusov. V takih primerih privzamemo binomsko porazdelitev. $Y$ nam lahko meri tudi števne podatke, naprimer 
-koliko zabav je obiskal študent v preteklem mesecu. Seveda pa lahko $Y$ predstavlja tudi zvezne podatke,
-v tem primeru lahko privzamemo normalno porazdelitev (ali pa kakšno drugo zvezno porazdelitev).
+število uspehov v fiksnem številu poskusov. V takih primerih privzamemo binomsko porazdelitev. $Y$ nam lahko meri tudi števne (koliko zabav je obiskal študent v preteklem mesecu), 
+ali pa zvezne podatke. V slednjem primeru običajno privzamemo normalno porazdelitev (ali pa kakšno drugo zvezno porazdelitev).
 \subsubsection{Sistematični del} 
 \textit{Sistematična komponenta} posplošenega linearnega modela poda relacije med pojasnjevalnimi spremenljivkami $x_{ij}$. Te nastopajo 
 linearno, torej je sistematični del enak
 \[
-\beta_{0} + x_{i1}\beta_{1} + x_{i2}\beta_{2} + \ldots + x_{ip}\beta_{p}
+\eta_{i} = \beta_{0} + x_{i1}\beta_{1} + x_{i2}\beta_{2} + \ldots + x_{ip}\beta_{p},
+\]
+oziroma
+\[
+    \eta = \mathbf{X}\beta
 \]
 \subsubsection{Povezovalna funkcija}
 Tretji del posplošenega linearnega modela je \textit{povezovalna funkcija}, ta nam poda funkcijo $g(\cdot)$ med slučajno komponento
@@ -287,7 +280,7 @@ in sistematičnim delom. Če označimo $\mu = \mathbb{E}(Y)$, je
     g(\mu) = \beta_{0} + x_{i1}\beta_{1} + x_{i2}\beta_{2} + \ldots + x_{ip}\beta_{p}
 \]
 Najenostavnejša taka funkcija je kar identiteta, torej $g(\mu) = \mu$. Ta nam torej da linearno povezavo med pojasnjevalnimi spremenljivkami 
-in pričakovano vrednostjo naših slučajnih spremenljivki. To je ena od oblik regresije za zvezne podatke.
+in pričakovano vrednostjo naših slučajnih spremenljivk. To je ena od oblik regresije za zvezne podatke.
 Mnogokrat pa linearna relacija ni primerna - fiksna sprememba pojasnjevalnih spremenljivk ima lahko večji vpliv, če je pričakovana vrednost 
 bližje 0, kot če je bližje 1. Recimo, da je $\pi$ verjetnost, da bo oseba kupila nov avto, ko je njen dohodek enak $x$. Sprememba v dohodku
 za 10.000\euro~ima manjši vpliv, če je dohodek 1.000.000\euro,~kot če je 50.000\euro.
@@ -336,14 +329,14 @@ Najti želimo tak parameter, v katerem bo funkcija verjetja zavzela svoj maksimu
 \[
     F(\hat{\theta}) = \underset{\theta \in \overline{\Theta}}{\max}{F(\theta)}.
 \]
-Opazimo, da si računanje lahko precej poenostavimo, če obe strani zgornje enačbe logaritmiramo
+Računanje si lahko precej poenostavimo, če obe strani zgornje enačbe logaritmiramo
 \begin{equation}
-    \log(F(\theta)) = L(\theta) = \sum_{i=1}^{n}\log f_{i}(x_{i},\theta).
+    \log(F(\theta)) = \sum_{i=1}^{n}\log f_{i}(x_{i},\theta).
 \end{equation}
-Funkciji $L$ rečemo logaritemska funkcija verjetja, njene stacionarne točke pa bodo kandidati za cenilko največjega verjetja. Ker je logaritem 
-naraščajoča funkcija, bodo ekstremi $L$ in $F$ sovpadali. Rešiti moramo torej sistem enačb
+Zgornji funkciji rečemo logaritemska funkcija verjetja, njene stacionarne točke pa bodo kandidati za cenilko največjega verjetja. Ker je logaritem 
+naraščajoča funkcija, bodo ekstremi $F$ in $\log (F)$ sovpadali. Rešiti moramo torej sistem enačb
 \begin{equation}\label{mle}
-    \frac{\partial}{\partial \theta_{j}}(L(\theta)) = 0~,j=1,\ldots,r,
+    \frac{\partial}{\partial \theta_{j}}(\log F(\theta)) = 0~,j=1,\ldots,r,
 \end{equation}
 ki mu rečemo tudi sistem \textit{enačb verjetja}, odvod logaritemske funkcije verjetja pa v statistiki pogosto poimenujejo \textit{zbirna funkcija}.
 Ko rešimo enačbe verjetja, najdemo ekstrem funkcije verjetja in dobimo \textit{cenilko največjega verjetja}, v angleščini pogosto označeno MLE (okrajšava za
@@ -364,11 +357,11 @@ Parametre $\beta$ ocenimo z metodo najmanjših kvadratov - iščemo tak $\hat{\b
 \[
     \lVert y - X\hat{\beta} \rVert^2 = \underset{\beta}{min}\lVert y-X\beta\rVert^2.
 \]
-Želimo torej element slike matrike X, ki bo v drugi normi najbližje vektorju $y, $ in izkaže se, da je to ravno pravokotna projekcija tega vektorja na $im(X).$ To lahko zapišemo Kot
+Želimo torej element slike matrike X, ki bo v drugi normi najbližje vektorju $y, $ in izkaže se, da je to ravno pravokotna projekcija tega vektorja na $im(X).$ To lahko zapišemo kot
 \[
-    \langle y-X\hat{\beta}, Xh \rangle = 0~\forall h\in\mathbb{R}^{p+1},
+    \langle y-X\hat{\beta}, Xh \rangle = 0,~\forall h\in\mathbb{R}^{p+1},
 \]
-kar pa velja natanko tedaj kot
+kar pa velja natanko tedaj ko
 \begin{align*}
     X^\top(y-X\hat{\beta}) &= 0 \\
     (X^\top X)\hat{\beta} &= X^\top y.
@@ -393,16 +386,20 @@ Najprej uvedimo
 \[ 
     \mathrm{obeti}_{i} = \frac{p_{i}}{1 - p_{i}} %poglej kako se tle da vejico
 \]
-kjer se premaknemo iz verjetnosti v \textit{deleže} -- verjetnost dogodka proti verjetnosti, da se ne bo zgodil. Če je $p_{i}$ enak $\frac{1}{2}$, 
-bo delež enak 1. Vidimo, da so deleži vedno pozitivni in niso omejeni navzgor.
-V naslednjem koraku pa poglejmo logaritem deležev ali logit verjetnosti
+kjer se premaknemo iz verjetnosti v \textit{obete} -- verjetnost dogodka proti verjetnosti, da se ne bo zgodil. Če je $p_{i}$ enak $\frac{1}{2}$, 
+bo enak 1. Vidimo, da so obeti vedno pozitivni in niso omejeni navzgor.
+V naslednjem koraku pa poglejmo njihov logaritem ali logit verjetnosti
 \[
     \eta_{i} = \mathrm{logit}(p_{i}) = \log \frac{p_{i}}{1 - p_{i}}
 \]
 s tem pa si odstranimo tudi omejitev navzdol. Opazimo še, da če je $p_{i} = \frac{1}{2}$, je delež enak 1 in je logaritem 0. Kot funkcija p, je logit
-strogo naraščajoča, torej imamo inverz. Označimo z $\eta_{i} = \exp{x_{i}^\top\beta}. $Običajno ga imenujemo \textit{antilogit}, izrazimo ga z:
+strogo naraščajoča, torej imamo inverz. Običajno ga imenujemo \textit{antilogit}, izrazimo ga z:
+\begin{equation}\label{p_i}
+    p_{i} = \mathrm{logit}^{-1}(\eta_{i}) = \frac{\exp{\eta_{i}}}{1+\exp{\eta_{i}}},
+\end{equation}
+kjer je
 \[
-    p_{i} = \mathrm{logit}^{-1}(\eta_{i}) = \frac{\exp{\eta_{i}}}{1+\exp{\eta_{i}}}
+    \eta_{i} = \exp{x_{i}^\top\beta}.
 \]
 Vse skupaj nam da \textit{logistični model}, ki za slučajni del vzame binomsko porazdelitev. %VPRAŠAJ KAJ JE Z NAPAKO
 Kot vidimo, zveza med prediktorji in verjetnostjo ni linearna, zato je težko oceniti, kako bo sprememba parametrov
@@ -421,23 +418,23 @@ Kot v vsakem posplošenem linearnem modelu tudi v tem predpostavimo neodvisnost 
 Naprej si oglejmo logaritemsko funkcijo verjetja. V nadaljnem računanju bom izpuščal binomski simbol na začetku - je samo konstanta, ki na
 končen rezultat nima vpliva. Po prejšnjih oznakah je torej
 \begin{align}\label{logit1}
-    L(p_{i}) &\propto \log\{\prod_{i=1}^{n} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}} \} \nonumber  \\
-        &\propto \sum_{i=1}^{n}\{y_{i}\log{p_{i}} + (n_{i} - y_{i})\log(1 - p_{i})\} \nonumber \\
-        &\propto \sum_{i=1}^{n}\{n_{i}\log{(1-p_{i})}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\}
+    \log (P(Y)) &= \log\{\prod_{i=1}^{n} p_{i}^{y_{i}}(1 - p_{i})^{n_{i} - y_{i}} \} \nonumber  \\
+        &= \sum_{i=1}^{n}\{y_{i}\log{p_{i}} + (n_{i} - y_{i})\log(1 - p_{i})\} \nonumber \\
+        &= \sum_{i=1}^{n}\{n_{i}\log{(1-p_{i})}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\}
 \end{align}
 Po predpostavki logističnega modela je
 \[
    \mathrm{logit}(p_{i}) = \log\left( \frac{p_{i}}{1-p_{i}}  \right) = x_{i0}\beta_{0} + x_{i1}\beta_{1} + \ldots + x_{ir}\beta_{r} = x_{i}^\top \beta,
 \]
-kjer je $x_{i0}=1,~i=1,\ldots,n$
+kjer je $x_{i0}=1,~i=1,\ldots,n.$
 
-Od tod lahko izrazimo verjetnosti $p_{i}$
-\begin{align}
-    p_{i} &= \frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}} \text{~ter} \\
-    1 - p_{i} &= \frac{1}{1 + \exp{x_{i}^\top\beta}}.
-\end{align}
-
-Spodnji funkciji rečemo \textit{sigmoida}, definiramo jo kot 
+%Od tod lahko izrazimo verjetnosti $p_{i}$
+%\begin{align}
+%    p_{i} &= \frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}} \text{~ter} \\
+%    1 - p_{i} &= \frac{1}{1 + \exp{x_{i}^\top\beta}}.
+%\end{align}
+%
+\textit{Sigmoido} je prikladno definirati kot
 \[
     f(x) = \frac{e^x}{1+e^x}.
 \] Iz njenega grafa je morda še bolj očitno, zakaj jo je smiselno uporabiti za modeliranje verjetnosti
@@ -466,34 +463,51 @@ Spodnji funkciji rečemo \textit{sigmoida}, definiramo jo kot
 \end{figure}
 \end{center}
 
-Če izpeljane izraze za verjetnost upoštevamo v logaritemski funkciji verjetja dobimo
+Če izpeljane izraze za verjetnost \refeq{p_i} upoštevamo v logaritemski funkciji verjetja dobimo
+
 \begin{align}
-    L(\beta) &\propto \sum_{i=1}^{n}\left( n_{i}\log{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  + y_{i}\log{\left( \frac{\frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}}}{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  \right)} \right) \nonumber\\
-                &\propto \sum_{i=1}^{n}\left( y_{i}(x_{i}^\top\beta) - n_{i}\log(1 + \exp{x_{i}^\top\beta})\right)
+    \log F(\beta)  &= \sum_{i=1}^{n}\left( n_{i}\log{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  + y_{i}\log{\left( \frac{\frac{\exp{x_{i}^{\top} \beta}}{1 + \exp{x_{i}^\top\beta}}}{\frac{1}{1 + \exp{x_{i}^\top\beta}}}  \right)} \right) \nonumber\\
+                &= \sum_{i=1}^{n}\left( y_{i}(x_{i}^\top\beta) - n_{i}\log(1 + \exp{x_{i}^\top\beta})\right)
 \end{align}
 Od tod vidimo, da je naša funkcija verjetja zares odvisna le od parametrov $\beta$,~vse ostalo nam je poznano. Da torej poiščemo maksimum in s tem
 cenilko največjega verjetja, funkcijo odvajamo in zbirno funkcijo enačimo z 0
 \[
-    \frac{\partial}{\partial \beta} L = \begin{bmatrix}
-                                 \frac{\partial L(\beta)}{\partial \beta_{0}} \\
-                                 \frac{\partial L(\beta)}{\partial \beta_{1}} \\
+    L(\beta) = \begin{bmatrix}
+                                 \frac{\partial}{\partial \beta_{0}}\log(F) \\
+                                 \frac{\partial}{\partial \beta_{1}}\log(F) \\
                                  \vdots \\
-                                 \frac{\partial L(\beta)}{\partial \beta_{p}}
-                        \end{bmatrix}
+                                 \frac{\partial}{\partial \beta_{r}}\log(F)
+                        \end{bmatrix},
+\]
+kjer je
+\[
+    L(\beta) = \frac{\partial}{\partial \beta} \log F(\beta).
 \]
 Pomembno je opaziti, da parametri $\beta$ vedno nastopajo ob pojasnjevalnih spremenljivkah linearno, zato bodo vse komponente enake oblike.
 J-ta komponenta bo tako enaka
-\begin{align}
-    \frac{\partial L(\beta)}{\partial \beta_{j}} &= \sum_{i=1}^{n} \left(x_{ij}(y_{i} - n_{i}p_{i}(\beta))   \right),~~j = 0,1,\ldots r,~~\text{kjer~smo~upoštevali} \\
-    \frac{\partial}{\partial \beta_{j}}(x_{i}^\top\beta) &= \frac{\partial}{\partial \beta_{j}}\left(\beta_{0} + x_{i1}\beta_{1} + \ldots x_{ir}\beta_{r}\right) \nonumber\\
-                                                    &= x_{ij},
-\end{align}
+\begin{equation}
+    \frac{\partial}{\partial \beta_{j}} \log F(\beta) = \sum_{i=1}^{n} \left(x_{ij}(y_{i} - n_{i}p_{i}(\beta))\right) = \sum_{i=1}^{n} \left(x_{ij}(y_{i} - \mu_{i})\right),~~j = 0,1,\ldots r,
+\end{equation}
+kjer smo upoštevali
+\[
+    \frac{\partial}{\partial \beta_{j}}(x_{i}^\top\beta) = \frac{\partial}{\partial \beta_{j}}\left(\beta_{0} + x_{i1}\beta_{1} + \ldots x_{ir}\beta_{r}\right) = x_{ij}
+\]
 ter
 \begin{align}                                         
     \frac{\partial}{\partial \beta_{j}} \log(1 + \exp(x_{i}^\top\beta)) &= \frac{ \frac{\partial}{\partial \beta_{j}}\exp(x_{i}^\top\beta) }{1 + \exp(x_{i}^\top\beta)} \nonumber \\
     &= \frac{\exp(x_{i}^\top\beta)}{1 + \exp(x_{i}^\top\beta)} \frac{\partial}{\partial \beta_{j}} (x_{i}^\top\beta) \nonumber \\
     &=p_{i}(\beta)x_{ij}
 \end{align}
+in
+\[
+    n_{i}p_{i}(\beta) = \mu_{i}(\beta).
+\]
+
+Funkcijo zbira kot produkt matrik zapišemo
+\begin{align}\label{prvi}
+    L(\beta) = \mathbf{X}^\top(y - \mu(\beta))
+\end{align}
+
 Enačbe, ki jih s tem postopkom dobimo, v splošnem niso eksplicitno rešljive. Za reševanje se uporablja numerične metode, ki slonijo na Newtonovi iteraciji. Kot
 bomo kasneje pokazali, je zanjo potrebno izračunati še drugi odvod, zato to storimo tu. Zopet odvajamo po komponentah, tako kot zgoraj. Najprej izračunajmo
 \begin{align}
@@ -502,42 +516,42 @@ bomo kasneje pokazali, je zanjo potrebno izračunati še drugi odvod, zato to st
 \end{align}
 Vse sedaj skupaj sestavimo v
 \begin{align}
-    \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} L(\beta)= - \sum_{i}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right),~~j,k = 0,1,\ldots, r
+    \frac{\partial^2}{\partial \beta_{j}\partial\beta_{k}} \log F(\beta) &= - \sum_{i=1}^{n}\left(x_{ij}x_{ik}n_{i}p_{i}(\beta)(1-p_{i}(\beta))\right)
+    &= -\sum_{i=1}^{n}\left(x_{ij}x_{ik}v_{i}(\beta)\right),~~j,k = 0,1,\ldots, r
 \end{align}
-Spomnimo se, da delamo z binomskimi slučajnimi spremenljivkami in torej velja $var(Y_{i}) = v_{i}(\beta) = n_{i}p_{i}(1-p_{i}),$~kar vključimo v zgornjo enačbo in končno dobimo
-\begin{align}
-    \ddot{\ell}(\beta) = -\sum_{i=1}^{n}\left(x_{ij}x_{ik}v_{i}(\beta)\right).
-\end{align}
-Zapišimo zgoraj izpeljane zveze v berljivejšo matrično notacijo. 
-\begin{equation*}
-    \log \left(\frac{p}{1-p}\right) = \mathbf{X}\beta
-\end{equation*}
-Vektorsko definiramu tudi
-\[
-    \exp{\mathbf{X}\beta} = \begin{bmatrix}
-                            \exp{x_{1}^\top\beta} \\
-                            \vdots\\
-                            \exp{x_{n}^\top\beta}
-                            \end{bmatrix},
-\]
-spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo 
-\begin{align} \label{ell}
-    L(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{1-p_{i}}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
-    &= y^\top\mathbf{X}\beta - n^\top \log(1 + \exp{\mathbf{X}\beta}),
-\end{align}
-in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
-\begin{equation}
-    \dot{L}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
-\end{equation}
-kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
-S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komponent in torej lahko zapišemo
-\begin{equation}
-    \mathrm{E}(Y) = m \circ p(\beta) \equiv \mu(\beta),
-\end{equation}
-in lahko končno vse povzamemo v
-\begin{align}\label{prvi}
-    \dot{L}(\beta) = \mathbf{X}^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
-\end{align}
+
+kjer smo v drugi vrstici upoštevali  $var(Y_{i}) = v_{i}(\beta) = n_{i}p_{i}(1-p_{i}).$
+
+%Zapišimo zgoraj izpeljane zveze v berljivejšo matrično notacijo. 
+%\begin{equation*}
+%    \log \left(\frac{p}{1-p}\right) = \mathbf{X}\beta
+%\end{equation*}
+%Vektorsko definiramu tudi
+%\[
+%    \exp{\mathbf{X}\beta} = \begin{bmatrix}
+%                            \exp{x_{1}^\top\beta} \\
+%                            \vdots\\
+%                            \exp{x_{n}^\top\beta}
+%                            \end{bmatrix},
+%\]
+%spomnimo se enačbe \eqref{logit1} in iz nje izpeljimo 
+%\begin{align} \label{ell}
+%    L(\beta) &= \sum_{i=1}^{n}\{n_{i}\log{(1-p_{i})}  + y_{i}\log{\left(\frac{p_{i}}{1-p_{i}}\right)}\} \nonumber\\
+%    &= y^\top\mathbf{X}\beta - n^\top \log(1 + \exp{\mathbf{X}\beta}),
+%\end{align}
+%in še odvoda zgornje funkcjie, ki pa ga lahko zapišemo kot
+%\begin{equation}
+%    \dot{L}(\beta) = \mathbf{X}^\top(y - m\circ p(\beta)),
+%\end{equation}
+%kjer je s $\circ$ označeno Hadamardovo množenje po elementih.
+%S pričakovano vrednostjo vektorja označimo vektor pričakovanih vrednosti komponent in torej lahko zapišemo
+%\begin{equation}
+%    \mathrm{E}(Y) = m \circ p(\beta) \equiv \mu(\beta),
+%\end{equation}
+%in lahko končno vse povzamemo v
+%\begin{align}\label{prvi}
+%    \dot{L}(\beta) = \mathbf{X}^\top(y - m \circ p(\beta)) = X^\top(y - \mu(\beta))
+%\end{align}
 Ostane nam le še dvojni odvod. Najprej si oglejmo
 \[
     v(\beta) = \begin{bmatrix}
@@ -549,48 +563,59 @@ Ostane nam le še dvojni odvod. Najprej si oglejmo
 \]
 iz tega potem takoj sledi, da je
 \begin{equation} \label{drugi}
-    \ddot{L}(\beta) = -\mathbf{X}^\top v(\beta)\mathbf{X},
+    \frac{\partial}{\partial \beta}{L}(\beta) = -\mathbf{X}^\top v(\beta)\mathbf{X},
 \end{equation}
 torej element v $j$-ti vrstici in $k$-tem stolpcu je $\sum_{i=1}^{n}x_{ij}x_{ik}v_{i}(\beta).$
 
 \subsection{Obstoj rešitve enačb verjetja v logističnem modelu}
 
-V prejšnjem odseku smo izpeljali enačbe verjetja za logistično regresijo in videli, da v splošnem niso analitično rešljive. Porodi pa se vprašanje,
-kdaj rešitev pravzaprav sploh obstaja? Izkaže se, da je obstoj in enoličnost rešitve v logističnem modelu moč dokazati iz podatkov. Sledeče poglavje temelji na članku
+V prejšnjem odseku smo izpeljali enačbe verjetja za logistično regresijo in pripomnili, da v splošnem niso analitično rešljive. Porodi pa se vprašanje,
+kdaj rešitev pravzaprav sploh obstaja? Izkaže se, da je obstoj in enoličnost rešitve v logističnem modelu moč dokazati iz podatkov. Sledeči podrazdelek temelji na članku
 \cite{albert1984existence}.
 
-Zopet bomo vpeljali nekaj novih oznak. Imejmo $n$ neodvisnih opazovanj vektorja dimenzije $p$ in določimo $(x,H),$ kjer je $x^\top = (x_{0},\ldots,x_{p}),x_{0}\equiv 1,$
+Zopet bomo vpeljali nekaj novih oznak. Imejmo $n$ neodvisnih opazovanj vektorja dimenzije $p$ in določimo $(x,H),$ kjer je $x^\top = (x_{0},\ldots,x_{r}),x_{0}\equiv 1,$
 $H$ pa je spremenljivka, ki zavzame vrednosti $H_{1},\ldots,H_{g}$ in pokaže kateri skupini pripada določeno opazovanje. V našem primeru je $g=2$, $H_{1}$ ustreza Bernoullijevi
 enki, $H_{2}$ pa Bernoullijevi ničli.
 
-\subsubsection{Funkcija verjetja}
-Za potrebe tega poglavja vpeljimo novo notacijo za funkcijo verjetja
-\begin{equation}
-    \begin{aligned}
-    \mathbf{pr}(H_{s}|x) = \exp(\beta_{s}^\top x)\mathbf{pr}(H_{g}|x),~s=1,\ldots,g-1 \\
-    \mathbf{pr}(H_{g}|x) = \nicefrac{1}{\sum_{s=1}^{g}\exp(\beta_{s}^\top x)} \\
-    \beta_{s}^\top = (\beta_{s0},\ldots,\beta_{sp}),~s=1,\ldots,g-1,~\beta_{g}^\top=0
-    \end{aligned}
-\end{equation}
-Za ilustracijo si zopet poglejmo primer $g=2,$ enačbe verjetja potem izgledajo
-\begin{equation}
-    \begin{aligned}
-    \mathbf{pr}(H_{2}|x) = \frac{1}{\exp(\beta_{1}^\top x) + \exp{(\beta_{2}^\top x)}} = \frac{1}{1 + \exp(\beta^\top x)} \\
-    \mathbf{pr}(H_{1}|x) = \frac{\exp(\beta_{1}^\top x)}{1 + \exp(\beta_{1}^\top x)},\\
-    \end{aligned}
-\end{equation}
-kar se seveda sklada z enačbami iz prejšnjega poglavja.
+%\subsubsection{Funkcija verjetja} %to je mogoče res nepotrebno.
+%Za potrebe tega poglavja vpeljimo novo notacijo za funkcijo verjetja
+%\begin{equation}
+%    \begin{aligned}
+%    \mathbf{pr}(H_{s}|x) = \exp(\beta_{s}^\top x)\mathbf{pr}(H_{g}|x),~s=1,\ldots,g-1 \\
+%    \mathbf{pr}(H_{g}|x) = \nicefrac{1}{\sum_{s=1}^{g}\exp(\beta_{s}^\top x)} \\
+%    \beta_{s}^\top = (\beta_{s0},\ldots,\beta_{sp}),~s=1,\ldots,g-1,~\beta_{g}^\top=0
+%    \end{aligned}
+%\end{equation}
+%Za ilustracijo si zopet poglejmo primer $g=2,$ enačbe verjetja potem izgledajo
+%\begin{equation}
+%    \begin{aligned}
+%    \mathbf{pr}(H_{2}|x) = \frac{1}{\exp(\beta_{1}^\top x) + \exp{(\beta_{2}^\top x)}} = \frac{1}{1 + \exp(\beta^\top x)} \\
+%    \mathbf{pr}(H_{1}|x) = \frac{\exp(\beta^\top x)}{1 + \exp(\beta^\top x)},\\
+%    \end{aligned}
+%\end{equation}
+%kar se seveda sklada z enačbami iz prejšnjega poglavja.
 
-Potrebujemo še način za razvrščanje vektorjev v skupine. Vektor $x$ pripada skupini $H_{s}$ natanko tedaj, ko velja
+Potrebujemo način za razvrščanje vektorjev v skupine. Vektor $x$ pripada skupini $H_{1}$ natanko tedaj, ko velja
 \[
-    (\beta_{s}-\beta_{t})^\top x \geq 0,~t=1,\ldots,g.
+    \langle x,\beta \rangle \geq 0
 \]
-Predpostavimo še, da je matrika opazovanj $X$, dimenzije $n\times(p+1),$ polnega ranga. Označimo z $E_{s}$ množico identifikatorjev vrstic matrike $X,$ ki pripadajo
-skupini $H_{s}.$
+in skupini $H_{2},$ če velja
+\[
+    \langle x,\beta \rangle \leq 0.
+\]
+
+Označimo še $E_{1} = {i \vline y_{i} = 1}$ in $E_{1} = {i \vline y_{i} = 0},$ torej indekse vrstic kjer je element vektorja $Y$ enak nič oziroma 1.
+
+
 Logaritemsko funkcijo verjetja v splošnem zapišemo kot
 \[
-    \log L (X,\beta) = \sum_{j=1}^{g}\sum_{i\in E_{j}}\log\left(\frac{1}{\sum_{t=1}^{g} \exp(\beta_{t}-\beta_{j})^\top x_{i}}\right)
+    \log F(X,\beta) = \sum_{j=1}^{g}\sum_{i\in E_{j}}\log\left(\frac{1}{\sum_{t=1}^{g} \exp(\beta_{t}-\beta_{j})^\top x_{i}}\right),
 \]
+
+v našem primeru pa se poenostavi na
+\begin{equation*}
+\log F(X,\beta) = \sum_{i\in E_{1}} \log\left(\frac{1}{1+\exp(-\langle x_{i},\beta \rangle)}\right) + \sum_{i\in E_{2}}\log\left(\frac{1}{\exp(\langle x_{i},\beta \rangle) + 1}\right)
+\end{equation*}
 
 V nadaljevanju bomo ločeno obravnavali možnosti, kako so lahko podatki razporejeni glede na to, kateri skupini pripadajo. Podrobneje si bomo pogledali in narisali
 primere, ko sta skupini dve - tedaj imamo tri možnosti:
@@ -602,23 +627,31 @@ primere, ko sta skupini dve - tedaj imamo tri možnosti:
 Na podlagi tega lahko določimo, ali rešitev enačb verjetja obstaja in je enolična.
 
 \subsubsection{Popolna separacija}
-Popolna separacija v podatkih je prisotna, če obstaja tak vektor $\beta$, da za vse $i\in E_{j}$ in $j,t = 1,\ldots,g,~j\neq t$ velja
+Popolna separacija v podatkih je prisotna, če 
 \[
-    (\beta_{j}-\beta_{k})^\top x_{i} > 0.
+    \exists \beta: \forall i \in E_{1}: \langle x_{i},\beta \rangle > 0,~
+    \forall i \in E_{2}: \langle x_{i},\beta \rangle < 0
 \]
-Torej obstaja vektor $\beta,$ ki nam podatke popolnoma loči na skupine. 
-V primeru dveh skupin se pogoj prevede na $\beta^\top x_{i}>0, i\in E_{1}$ in $\beta^\top x_{i}<0, i\in E_{2}.$
+%Torej obstaja vektor $\beta,$ ki nam podatke popolnoma loči na skupine. 
+%V primeru dveh skupin se pogoj prevede na $\beta^\top x_{i}>0, i\in E_{1}$ in $\beta^\top x_{i}<0, i\in E_{2}.$
 
 
 \begin{izrek}
     Če je v podatkih prisotna popolna separacija, cenilka največjega verjetja $\hat{\beta}$ ne obstaja in velja
     \[
-        \max_{\beta} L(X,\beta) = 1.
+        \sup_{\beta} F(X,\beta) = 1.
     \]
 \end{izrek}
 
-Izkaže se, da svoj maksimum funkcija verjetja doseže, ko parameter pošljemo v neskončnost - torej končna rešitev in s tem cenilka največjega verjetja ne obstaja. Grafično
-si v primeru $g = 2$ popolno separacijo predstavljamo takole
+\begin{proof}
+    Če tak $\beta$ obstaja, potem je
+    \[
+    \log F(X,\beta) = \sum_{i\in E_{1}} \log\left(\frac{1}{1+\exp(-\underbrace{\langle x_{i},\beta \rangle}_{>0})}\right) + \sum_{i\in E_{2}}\log\left(\frac{1}{\exp(\underbrace{\langle x_{i},\beta \rangle}_{<0}) + 1}\right).
+    \]
+    V log-verjetje vstavljamo $\lambda \cdot \beta$ in ko pošljemo $\lambda$ proti neskončnosti, gre zgornji izraz proti 0, torej je res $\sup_{\beta} F(X,\beta) = 1.$
+\end{proof}
+
+Grafično si popolno separacijo predstavljamo takole
 \begin{center}
     \begin{figure}[h!]
     \begin{tikzpicture}
@@ -646,18 +679,18 @@ kjer ena barva predstavlja podatke v prvi skupini, druga pa v drugi. Podatke lah
 bodisi Bernoullijevi ničli.
 
 \subsubsection{Nepopolna separacija}
-Nepopolna separacija v podatkih je prisotna, če obstaja tak vektor $\beta$, da za vse $i\in E_{j}$ in $j,t = 1,\ldots,g,~j\neq t$ velja
+Nepopolna separacija v podatkih je prisotna, če obstaja tak vektor $\beta$, da velja
 \begin{equation}\label{nepopolnaSep}
-    (\beta_{j}-\beta_{k})^\top x_{i} \geq 0,
+    \forall i \in E_{1}: \langle x_{i},\beta \rangle \geq 0,~\forall i\in E_{2}: \langle x_{i},\beta \rangle \leq 0,
 \end{equation}
-pri čemer velja enakost za vsaj eno trojico $(i,j,t).$
+pri čemer velja enakost za vsaj en $i$.
 
 Kot je omenjeno že zgoraj, v tem primeru podatke lahko popolnoma ločimo, a nekatri ležijo popolnoma na meji. Lahko pa se zgodi, da je podatke možno ločiti na več načinov. V spodnjih
 slikah sta obravnavana oba primera - ko imamo eno samo ločnico in ko jih je možno najti več.
 
 Poglejmo si primer, ko je $g=2$. Označimo s $Q(\beta)$ tiste podatke, ki zadoščajo enakosti v \eqref{nepopolnaSep} in recimo da je takih $r \neq 0$. Naj bo 
-$X^{q}$ matrika teh opažanj dimenzij $r\times(p+1).$ Velja $X^{q}\beta=0,$ torej so vrstice v $X^{q}$ linearno odvisne in pripadajo podprostoru dimenzije $d \leq p-1$.
-Velja tudi $d = rang(X^{q}) - 1.$ Če je $rang(X^{q}) = p$ je torej ločnica med podatki enolična, kot v sliki \ref{fig:enolicna}, sicer pa je takih ločnic lahko več, kot vidimo v
+$X^{q}$ matrika teh opažanj dimenzij $r\times(p+1).$ Velja $X^{q}\beta=0,$ torej so vrstice v $X^{q}$ linearno odvisne in pripadajo podprostoru dimenzije $d \leq p$.
+Velja tudi $d = rang(X^{q}).$ Če je $rang(X^{q}) = p$ je torej ločnica med podatki enolična, kot v sliki \ref{fig:enolicna}, sicer pa je takih ločnic lahko več, kot vidimo v
 sliki \ref{fig:neenolicna}.
 \begin{center}
     \begin{figure}[h!]
@@ -741,28 +774,29 @@ Vidimo, da v tem primeru podatkov ni možno razdeliti na dve ločeni skupini
 Kot bomo spoznali v sledečem razdelku, spada logistična regresija med tako imenovane modele s "'kanonično"` povezovalno funkcijo. 
 Za vpeljavo tega ter prenekaterih ostalih pojmov pa potrebujemo nekaj dodatne teorije.
 
-\subsubsection{Pomembnost kanoničnih povezvalnih funkcij}\label{kan}
-Kot smo omenili že v uvodu povezovalna funkcija opisuje relacijo med pričakovano vrednostjo opazovane spremenljivke in desno stranjo našega modela, torej
-sistematično komponento modela. Eksponentno družino torej v splošnem sestavljajo porazdelitve, z gostotami oblike
-\[
-    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{y\theta - b(\theta)}{a(\phi)} + c(y, \phi)\right)}.
-\]
-Enačbo logaritmiramo in dobimo
-\[
-    L(y;\theta) = \frac{y\theta-b(\theta)}{a(\phi)} + c(y;\phi),
-\]
-njen odvod, torej funkcija zbira pa je 
-\[
-    \frac{\partial}{\partial \theta} L(y;\theta) = \frac{y-b'(\theta)}{a(\phi)}.
-\]
-O kanonični povezovalni funkciji govorimo, če velja $\theta=\eta,$ torej je naravni parameter eksponentne družine ravno enak funkciji pričakovane vrednosti v modelu.
-Da uporabimo logit verjetnosti v logističnem modelu torej ni naključje - videli smo, da je $\textbf{logit}(p_{i})$ enak parametru $\theta.$ Spodaj je navedenih še nekaj ostalih
-kanoničnih povezovalnih funkcij, njihovo uporabnost bomo spoznali v naslednjem razdelku.
+\subsubsection{Pomembnost kanoničnih povezovalnih funkcij}\label{kan}
+Kot smo omenili že v uvodu povezovalna funkcija opisuje relacijo med pričakovano vrednostjo opazovane spremenljivke in
+sistematično komponento modela. Eksponentno družino in nekaj osnovnih zvez smo predstavili že v poglavju \ref{eksponentnaDruzina}.
+%\[
+%    f_{Y}(y; \theta, \phi) = \exp{\left(\frac{y\theta - b(\theta)}{a(\phi)} + c(y, \phi)\right)}.
+%\]
+%Enačbo logaritmiramo in dobimo
+%\[
+%    L(y;\theta) = \frac{y\theta-b(\theta)}{a(\phi)} + c(y;\phi),
+%\]
+%njen odvod, torej funkcija zbira pa je 
+%\[
+%    \frac{\partial}{\partial \theta} L(y;\theta) = \frac{y-b'(\theta)}{a(\phi)}.
+%\]
+Povezovalna funkcija posplošenega linearnega modela je kanonična, če je enaka naravnemu parametru eksponentne družine. V logistični regresiji je povezovalna funkcija logit,
+v poglavju \ref{eksponentnaDruzina} pa smo pokazali, da je za binomsko porazdelitev to ravno naravni parameter. Logit je torej kanonična povezovalna funkcija v logističnem modelu.
+
+V spodnji tabeli je navedenih še nekaj drugih primerov takih funkcij.
 
 \begin{center}
     \begin{tabular}{ | c | c | c |}
         \hline
-        Porazdelitev & $f(\mu)$ & Uporaba \\
+        Porazdelitev & $g(\mu)$ & Uporaba \\
         \hline
         Normalna & $id(\mu)$ &  Linearni odgovori\\
         Poissonova & $\log \mu$ & Število pojavitev \\
@@ -777,17 +811,17 @@ Kot smo že v zgledu z logistično regresijo videli, potrebujemo odvode logarite
     \frac{\partial L}{\partial\beta_{j}} = \left(\frac{\partial L}{\partial \theta}\right)\left(\frac{\partial \theta}{\partial\mu}\right)
     \left(\frac{\partial\mu}{\partial\eta}\right)\left(\frac{\partial\eta}{\partial\beta_{j}}\right).
 \]
-Lotimo se ga po korakih. Prvi člen smo že zgoraj izračunali kot $\frac{y-b'(\theta)}{a(\phi)}.$ Z uporabo $(b')^{-1}(\mu) = \theta$ in pravila za odvajanje inverzne funkcije 
-dobimo $\frac{\partial \theta}{\partial\mu} = \frac{1}{b''(\theta)} = \frac{a(\phi)}{\mathrm{Var}(Y)},$ zadnji člen pa bo kar vedno enak $x_{ij}.$ Tretji člen je odvisen
+Lotimo se ga po korakih. Prvi faktor smo že zgoraj izračunali kot $\frac{y-b'(\theta)}{a(\phi)}.$ Z uporabo $(b')^{-1}(\mu) = \theta$ in pravila za odvajanje inverzne funkcije 
+dobimo $\frac{\partial \theta}{\partial\mu} = \frac{1}{b''(\theta)} = \frac{a(\phi)}{\mathrm{Var}(Y)},$ zadnji faktor pa bo kar vedno enak $x_{ij}.$ Tretji člen je odvisen
 od povezovalne funkcije in se mu bomo posvetili nekoliko kasneje. Sestavimo vse skupaj in dobimo
 \[
-    \frac{\partial L}{\partial\beta_{j}} = \frac{y-\mu}{var(Y)}\frac{\partial \mu}{\partial\eta}x_{ij}.
+    \frac{\partial L}{\partial\beta_{j}} = \frac{y-\mu}{\mathrm{Var}(Y)}\frac{\partial \mu}{\partial\eta}x_{ij}.
 \]
 
 Opazimo: če imamo opravka s kanonično povezovalno funkcijo je $\eta = \theta!$ Torej namesto odvajanja po prvem parametru, lahko $\mu$ odvajamo po $\theta$ in
 dobimo $\frac{\partial\mu}{\partial\theta} = b''(\theta)$ in se odvod še dodatno poenostavi v
 \begin{equation}
-    \frac{\partial L}{\partial\beta_{j}} = \frac{y-\mu}{var(Y)}b''(\theta)x_{ij} = \frac{y-\mu}{a(\phi)}x_{ij}.
+    \frac{\partial L}{\partial\beta_{j}} = \frac{y-\mu}{\mathrm{Var}(Y)}b''(\theta)x_{ij} = \frac{y-\mu}{a(\phi)}x_{ij}.
 \end{equation}
 
 Za numerične metode bomo potrebovali še druge odvode, kjer pa nam pomaga informacijska enakost iz dokaza trditve \ref{izp}.
@@ -795,15 +829,19 @@ Za numerične metode bomo potrebovali še druge odvode, kjer pa nam pomaga infor
 Najprej izračunajmo pričakovano vrednost odvoda funkcije zbira
 \begin{align*}
     -\mathbb{E}(\frac{\partial^2 L}{\partial\beta_{j}\partial\beta_{k}}) &= \mathbb{E}((\frac{\partial L}{\partial \beta_{j}})(\frac{\partial L}{\partial \beta_{k}})) \\
-    &= \mathbb{E}(\frac{y-\mu}{var(Y)^2})(\frac{\partial\mu}{\partial\eta})^{2}x_{ij}x_{ik} \\
-    &= \frac{1}{var(Y)}(\frac{\partial\eta}{\partial\mu})^{2}x_{ij}x_{ik} \\
-    &= \frac{b''(\theta)}{a(\phi)}x_{ij}x_{ik}.
+    &= \mathbb{E}\left(\left(\frac{y-\mu}{\mathrm{Var}(Y)}\right)^{2}\right)(\frac{\partial\mu}{\partial\eta})^{2}x_{ij}x_{ik} \\
+    &= \frac{1}{\mathrm{Var}(Y)}(\frac{\partial\mu}{\partial\eta})^{2}x_{ij}x_{ik} \\
+    &= \frac{b''(\theta)}{a(\phi)}x_{ij}x_{ik},
 \end{align*}
+kjer smo v prehodu v zadnjo vrstico upoštevali $\eta = \theta,$ torej 
+\[
+    \frac{\partial \mu}{\partial\eta} = \frac{\partial\mu}{\partial\theta} = b''(\theta)
+\]
 
 Po drugi strani pa je običajen drugi odvod enak
 \begin{align*}    
     \frac{\partial^2L}{\partial\beta_{j}\partial\beta_{k}} &= \frac{\partial}{\beta_{k}}\{\left(\frac{\partial L}{\partial\theta}\right)\left(\frac{\partial \theta}{\partial\beta_{j}}\right)\}\\
-    &= \frac{\partial L}{\partial\theta}\left(\frac{\partial^2\theta}{\partial\beta_{j}\partial\beta_{k}}\right) + \left(\frac{\partial\theta}{\partial\beta_{j}}\right)\left(\frac{\partial^2L}{\partial\theta^2}\frac{\partial\theta}{\partial\beta_{k}}\right) \\
+    &= \frac{\partial L}{\partial\theta}\left(\frac{\partial^2\theta}{\partial\beta_{j}\partial\beta_{k}}\right) + \left(\frac{\partial\theta}{\partial\beta_{j}}\right)\left(\frac{\partial^2L}{\partial\theta^2}\right)\left(\frac{\partial\theta}{\partial\beta_{k}}\right) \\
     &= 0 + \frac{\partial^2L}{\partial\theta^2}x_{ij}x_{ik},
 \end{align*}
 prej pa smo že dokazali da je
@@ -821,7 +859,7 @@ Uporabnost zgornjega rezultata pa nam bo dalo poglavje o numeričnih metodah.
 Za poljubno povezovalno funkcijo smo v zgornjem razdelku pokazali
 \begin{align*}    
     \frac{\partial}{\partial\beta_{j}}L &= \frac{y-\mu}{\mathrm{Var}(Y)}\left(\frac{\partial\mu}{\partial\eta}\right)x_{ij}\\
-    -\mathbb{E}(\frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}) &= \frac{1}{\mathrm{Var}(Y)}\left(\frac{\partial\mu}{\partial\eta}\right)^2x_{ij}x_{ik}
+    -\mathbb{E}(\frac{\partial^2L}{\partial\beta_{j}\partial\beta_{k}}) &= \frac{1}{\mathrm{Var}(Y)}\left(\frac{\partial\mu}{\partial\eta}\right)^2x_{ij}x_{ik}
 \end{align*}
 
 
@@ -841,66 +879,74 @@ Očitno v tem primeru ne delamo s kanonično povezovalno funkcijo, kot smo to po
 \subsubsection{Ocenjevanje parametrov probit regresije}
 Podobno kot v logističnem modelu, se bomo ocenjevanja parametrov lotili po metodi največjega verjetja. 
 
-Za sistematični del modela privzemimo binomsko porazdeljene slučajne spremenljivke s parametroma $\mathrm{Bin}(m_{i},p_{i}(\beta))$,
+Za sistematični del modela privzemimo binomsko porazdeljene slučajne spremenljivke s parametroma $\mathrm{Bin}(n_{i},p_{i}(\beta))$,
 verjetnost pozitivnega izida pa izrazimo z
 \[
-    P(Y_{i} = y_{i}) = \binom{m_{i}}{y_{i}}p_{i}(\beta)^{y_{i}}(1 - p_{i}(\beta))^{m_{i} - y_{i}} = \binom{m_{i}}{y_{i}} (\Phi(x_{i}^\top \beta)^{y_{i}})(1 - \Phi(x_{i}^\top \beta))^{m_{i} - y_{i}} 
+    P(Y_{i} = y_{i}) = \binom{n_{i}}{y_{i}}p_{i}(\beta)^{y_{i}}(1 - p_{i}(\beta))^{n_{i} - y_{i}} = \binom{n_{i}}{y_{i}} (\Phi(x_{i}^\top \beta)^{y_{i}})(1 - \Phi(x_{i}^\top \beta))^{n_{i} - y_{i}} 
 \]
 Funkcijo verjetja, tako kot zgoraj izrazimo z gostotami posameznih komponent
 \[
-    F(\beta) = \prod_{i=1}^{n} \binom{m_{i}}{y_{i}} \Phi(x_{i}^\top\beta)^{y_{i}}(1 - \Phi(x_{i}^\top\beta))^{m_{i} - y_{i}},
+    F(\beta) = \prod_{i=1}^{n} \binom{n_{i}}{y_{i}} \Phi(x_{i}^\top\beta)^{y_{i}}(1 - \Phi(x_{i}^\top\beta))^{n_{i} - y_{i}},
 \]
 kjer binomski simbol izpustimo zaradi enostavnejšega pisanja. Zgornjo enačbo logaritmiramo in dobimo
 \begin{equation}
-    \log(F(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
+    \log(F(\beta)) = L(\beta) = \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (n_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right)
 \end{equation}
-Enačbo odvajamo po parametru $\beta,$ vendar se nam v tem primeru ne poenostavi kot z logistično funkcijo. Označimo s $ \phi = \frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}},$
-gostoto standardne normalne porazdelitve.
-\begin{align*}
-    \frac{\partial}{\partial\beta_{j}} L(\beta) &=
-    \frac{\partial}{\partial\beta_{j}} \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (m_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right) = \\
-    &= \sum_{i = 1}^{n}\left(\frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i^\top\beta})}x_{ij} - (m_{i}-y_{i})\frac{\phi(x_{i}^\top\beta)}{1-\Phi(x_{i^\top\beta})} x_{ij}  \right) = \\
-    &= \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i}}{\Phi(x_{i}^\top\beta)} - \frac{m_{i}-y_{i}}{1-\Phi(x_{i}^\top\beta)}\right) = \\
-    &= \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)
-\end{align*}
-Sistem enačb verjetja se torej glasi
+
+Izpeljava enačb verjetja v probit modelu je idejno zelo podobna tisti v poglavju \ref{ocenpar}. Kot smo videli v prejšnjem razdelku, nam uporaba nekanonične povezovalne
+funckije precej oteži delo in izrazi postanejo dolgi in zapleteni. Sistem enačb verjetja se v tem primeru glasi
+
+%Enačbo odvajamo po parametru $\beta,$ vendar se nam v tem primeru ne poenostavi kot z logistično funkcijo. Označimo s $ \phi = \frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}},$
+%gostoto standardne normalne porazdelitve.
+%\begin{align*}
+%    \frac{\partial}{\partial\beta_{j}} L(\beta) &=
+%    \frac{\partial}{\partial\beta_{j}} \sum_{i = 1}^{n}\left(y_{i}\log\Phi(x_{i}^\top\beta) + (n_{i} - y_{i})\log(1 - \Phi(x_{i}^\top\beta)) \right) = \\
+%    &= \sum_{i = 1}^{n}\left(\frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i^\top\beta})}x_{ij} - (n_{i}-y_{i})\frac{\phi(x_{i}^\top\beta)}{1-\Phi(x_{i^\top\beta})} x_{ij}  \right) = \\
+%    &= \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i}}{\Phi(x_{i}^\top\beta)} - \frac{n_{i}-y_{i}}{1-\Phi(x_{i}^\top\beta)}\right) = \\
+%    &= \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i} - n_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)
+%\end{align*}
+%Sistem enačb verjetja se torej glasi
 \begin{equation}
-    \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right) = 0,~~j=0,1,\ldots,r
+    \sum_{i = 1}^{n}\phi(x_{i}^\top\beta)x_{ij}\left(\frac{y_{i} - n_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right) = 0,~~j=0,1,\ldots,r
 \end{equation}
-Te enačbe očitno niso rešljive analitično in se bomo zopet morali poslužiti numeričnih metod. Kot smo videli že pri izpeljavi enačb za logistično regresijo,
- bomo za to potrebovali še druge odvode.
+Te enačbe v splošnem niso rešljive analitično in se bomo zopet morali poslužiti numeričnih metod, za katere potrebujemo še druge odvode.
+
+Izračunati želimo
 \begin{multline*}
-    \frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}L(\beta) = \sum_{i = 1}^{n}x_{ij}\left(\frac{\partial}{\partial\beta_{k}}[\phi(x_{i}^\top\beta)]\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)\\
-    +\frac{\partial}{\partial\beta_{k}}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)\phi(x_{i}^\top\beta)
+    \frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}L(\beta) = \sum_{i = 1}^{n}x_{ij}\left(\frac{\partial}{\partial\beta_{k}}[\phi(x_{i}^\top\beta)]\frac{y_{i} - n_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)\\
+    +\frac{\partial}{\partial\beta_{k}}\left(\frac{y_{i} - n_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right)\phi(x_{i}^\top\beta)
 \end{multline*}
-Izračunajmo najprej prvi člen
-\begin{align*}
-    \frac{\partial}{\partial\beta_{k}}\phi(x_{i}^\top\beta) &= \frac{\partial}{\partial\beta_{k}}\left(\frac{1}{\sqrt{2\pi}}e^{-\frac{(x_{i}^\top\beta)^2}{2}}\right) \\
-    &=\frac{-x_{i}^\top\beta}{\sqrt{2\pi}}e^{-\frac{(x_{i}^\top\beta)^2}{2}}x_{ik} \\
-    &= -x_{i}^\top\beta x_{ik}\phi(x_{i}^\top\beta).
-\end{align*}
-Drugi člen povzroča nekaj več preglavic.
-\begin{align}\label{drugiodv}
-    \frac{\partial}{\partial\beta_{k}}\left(\frac{y_{i} - m_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right) &= 
-    \frac{-m_{i}\phi(x_{i}^\top\beta)x_{ik}\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)) - (y_{i}-m_{i})\nicefrac{\partial}{\partial\beta_{k}(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))}}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2}
-\end{align}
-Posebej izračunajmo še
-\begin{align*}
-    \frac{\partial}{\partial\beta_{k}}(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))) &= \phi_{x_{i}^\top\beta}x_{ik}(1-\Phi(x_{i}^\top\beta)) - \Phi(x_{i}^\top\beta)\phi(x_{i}^\top\beta)x_{ik}\\
-    &= \phi(x_{i}^\top\beta)x_{ik}(1-2\Phi(x_{i}^\top\beta))
-\end{align*}
-in vključimo to v enačbo \eqref{drugiodv}
-\begin{align*}
-    &\frac{-m_{i}\phi(x_{i}^\top\beta)\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))x_{ik} - (y_{i} - m_{i}\Phi(x_{i}^\top\beta))\phi(x_{i}^\top\beta)x_{ik}(1-2\Phi(x_{i}^\top\beta))}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2} \\
-    &\phi(x_{i}^\top\beta)x_{ik}\frac{2y_{i}\Phi(x_{i}^\top\beta) - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2}
-\end{align*}
-Vse skupaj povzemimo v
+in po nekaj dela dobimo rezultat 
+
+%Izračunajmo najprej prvi člen
+%\begin{align*}
+%    \frac{\partial}{\partial\beta_{k}}\phi(x_{i}^\top\beta) &= \frac{\partial}{\partial\beta_{k}}\left(\frac{1}{\sqrt{2\pi}}e^{-\frac{(x_{i}^\top\beta)^2}{2}}\right) \\
+%    &=\frac{-x_{i}^\top\beta}{\sqrt{2\pi}}e^{-\frac{(x_{i}^\top\beta)^2}{2}}x_{ik} \\
+%    &= -x_{i}^\top\beta x_{ik}\phi(x_{i}^\top\beta).
+%\end{align*}
+%Drugi člen povzroča nekaj več preglavic.
+%\begin{align}\label{drugiodv}
+%    \frac{\partial}{\partial\beta_{k}}\left(\frac{y_{i} - n_{i}\Phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\right) &= 
+%    \frac{-n_{i}\phi(x_{i}^\top\beta)x_{ik}\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)) - (y_{i}-n_{i})\nicefrac{\partial}{\partial\beta_{k}(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))}}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2}
+%\end{align}
+%Posebej izračunajmo še
+%\begin{align*}
+%    \frac{\partial}{\partial\beta_{k}}(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))) &= \phi_{x_{i}^\top\beta}x_{ik}(1-\Phi(x_{i}^\top\beta)) - \Phi(x_{i}^\top\beta)\phi(x_{i}^\top\beta)x_{ik}\\
+%    &= \phi(x_{i}^\top\beta)x_{ik}(1-2\Phi(x_{i}^\top\beta))
+%\end{align*}
+%in vključimo to v enačbo \eqref{drugiodv}
+%\begin{align*}
+%    &\frac{-n_{i}\phi(x_{i}^\top\beta)\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))x_{ik} - (y_{i} - n_{i}\Phi(x_{i}^\top\beta))\phi(x_{i}^\top\beta)x_{ik}(1-2\Phi(x_{i}^\top\beta))}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2} \\
+%    &\phi(x_{i}^\top\beta)x_{ik}\frac{2y_{i}\Phi(x_{i}^\top\beta) - n_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta)))^2}
+%\end{align*}
+%Vse skupaj povzemimo v
 \begin{align*} %NE VIDI SE VSEGA. POGTUNTAJ KAKO ZMANJŠAT FONT
     \frac{\partial^2}{\partial\beta_{j}\partial\beta_{k}}L(\beta) &= \sum_{i = 1}^{n}x_{ij}\left(-x_{i}^\top\beta x_{ik} \phi(x_{i}^\top\beta)\frac{y_{i}-m_{i}}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}
             +\phi(x_{i}^\top\beta)^2x_{ik}\frac{2y_{i} - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))^2}\right) \\
     &= \sum_{i=1}^{n}x_{ij}\frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\left(\phi(x_{i}^\top\beta)\frac{2y_{i} - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))}
     -(x_{i}^\top\beta)(y_{i}-m_{i}\Phi(x_{i}^\top\beta)) \right)x_{ik}
 \end{align*}
+
 
 Zopet je koristno enačbe zapisati v matrični obliki. Za funkcijo zbira definirajmo vektor faktorjev
 \[
@@ -917,8 +963,8 @@ in tako funkcijo zbira poenostavimo v
 
 Na podoben način se lotimo tudi Hessejeve matrike. Definiramo diagonalno matriko, kjer so na diagonali členi
 \[
-    h_{i} = \frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\left(\phi(x_{i}^\top\beta)\frac{2y_{i} - m_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))}
-    -(x_{i}^\top\beta)(y_{i}-m_{i}\Phi(x_{i}^\top\beta)) \right),
+    h_{i} = \frac{\phi(x_{i}^\top\beta)}{\Phi(x_{i}^\top\beta)(1-\Phi(x_{i}^\top\beta))}\left(\phi(x_{i}^\top\beta)\frac{2y_{i} - n_{i}\Phi(x_{i}^\top\beta)^2 - y_{i}}{(\Phi(1-\Phi(x_{i}^\top\beta)))}
+    -(x_{i}^\top\beta)(y_{i}-n_{i}\Phi(x_{i}^\top\beta)) \right),
 \]
 torej $\mathbf{H} = diag(h_{1},\ldots,h_{n})$ in Hessejevo matriko zapišemo v preglednejši obliki
 \[
@@ -942,7 +988,7 @@ reševanje enačb $f(x) = 0,$ ki jih prevedemo na $g(x) = x,$ izberemo začetni 
 
 V najosnovnejši (ter najpogostejši) verziji za iskanje
 ničle funkcije ene spremenljivke začnemo v neki točki, naslendnjo pa izberemo v presčišču tangente, izračunane v 
-tej točki, z x-osjo. Postopek tako iterativno nadaljujemo. Ideja je torej sila preprosta, za izpeljavo pa tudi ni potrebno preveč truda.
+tej točki, z x-osjo. Postopek tako iterativno nadaljujemo. Ideja je torej sila preprosta.
 Predpostavimo odvedljivost funkcije na nekem intervalu in recimo, da imamo trenuten približek $x_{n}.$~Razvijmo sedaj funkcijo v Taylorjev
 polinom prve stopnje okoli $x_{n}:$
 \[
@@ -959,16 +1005,16 @@ težavami se bomo soočili v nadaljevanju.
 Imamo torej algoritem, ki najde ničlo, v luči iskanja cenilke največjega verjetja pa bi želeli algoritem, ki poišče maksimum oziroma minimum funkcije.
 Recimo, da imamo neko logaritemsko funkcijo verjetja $L$, in trenutni približek $\theta_{n}$. Razvijmo funkcijo okoli približka v Taylorjev polinom
 druge stopnje:
-\begin{align}
-    L(\theta) \approx L(\theta_{n}) + \frac{\partial}{\partial\theta}L(\theta_{n})(\theta - \theta_{n}) + \frac{1}{2}(\theta - \theta_{n})^\top \frac{\partial^2}{\partial\theta^2}L(\theta_{n})(\theta - \theta_{n}) \label{taylor}
+\begin{align}\label{taylor}
+    L(\theta) \approx L(\theta_{n}) + \frac{\partial}{\partial\theta}L(\theta_{n})(\theta - \theta_{n}) + \frac{1}{2}(\theta - \theta_{n})^\top \frac{\partial^2}{\partial\theta^2}L(\theta_{n})(\theta - \theta_{n}) 
 \end{align}
-Maksimizirati želimo desno stran \eqref{taylor}. To storimo tako, da gradient $L$ enačimo z nič:
+Maksimizirati želimo desno stran zgornje enačbe. To storimo tako, da gradient $L$ enačimo z nič:
 \[
     \frac{\partial}{\partial\theta} L(\theta_{n}) + \frac{\partial^2}{\partial\theta^2}L(\theta_{n})(\theta - \theta_{n}) = 0
 \]
 in izrazimo naslednji približek
 \[
-    \theta_{n + 1} = \theta_{n} - (\frac{\partial^2}{\partial\theta^2}L(\theta_{n}))^{-1}\frac{\partial}{\partial\theta}L(\theta_{n}).
+    \theta_{n + 1} = \theta_{n} - \left(\frac{\partial^2}{\partial\theta^2}L(\theta_{n})\right)^{-1}\frac{\partial}{\partial\theta}L(\theta_{n}).
 \]
 S tem postopkom imamo lahko dva problema. Prvič, lahko je zahtevno računati in invertirati drugi odvod (Hesian) funkcije, morda za kakšen $\theta_{n}$ sploh ne obstaja.
 Drugič, proč od $\hat{\theta}$ lahko Newtonova metoda napreduje navzgor ali navzdol -- oboje je enako verjetno. Z drugimi besedami, Newtonova metoda ni naraščajoč algoritem in torej
@@ -1004,7 +1050,7 @@ Na pamet takoj vidimo, da so ničle v $1$ in $-1$, če pa bi upoštevali iteraci
 Enaka težava seveda nastopi, če v sledečih korakih dobimo stacionarno točko oziroma se ji približujemo in tako delimo z vedno manjšimi števili, kar pa vodi v vselej slabše približke.
 
 Sicer redkeje, ampak lahko se zgodi, da se približki "`zaciklajo"'. Primer take funkcije je $f(x) = x^3 - 2x + 2,$ če za začetni približek vzamemo 0. Tako v zaporednih korakih najprej dobimo
-$x_{1} = 1$ in nato $x_{2} = 0$, kar pa je seveda naša začetna točka. Obstajajo okolice teh dveh točk, ki vedno konvergirajo v ta dvojni cikel in ne h iskani ničli. V splošnem 
+$x_{1} = 1$ in nato $x_{2} = 0$, kar pa je seveda naša začetna točka. Obstajajo okolice teh dveh točk, ki vedno konvergirajo v ta dvojni cikel in ne k iskani ničli. V splošnem 
 zna biti obnašanje takega zaporedja precej zapleteno, imenuje se Newtonov fraktal in se vanj tu ne bomo spuščali.
 
 Naslednja težava pa lahko nastopi, če se odvod naše funkcije lokalno ne obnaša dovolj "`lepo."' Prvič, odvod v ničli morda ne obstaja. Enostaven primer tega je 
@@ -1015,7 +1061,7 @@ $f(x) = \sqrt[3]{x}.$ Izračunamo lahko
 in vidimo, da za vsak začetni približek različen od nič metoda divergira. Splošneje, podoben rezultat dobimo za vsako funkcijo oblike $f(x) = \lvert x \rvert^{\alpha}, 0 < \alpha < \frac{1}{2},$
 za $\alpha = \frac{1}{2}$ pa metoda sicer ne divergira, vendar se kot v prejšnjem primeru zacikla in ne pridemo do rešitve.
 
-V zgoraj naštetih primerih torej Newtonova metoda ne konvergira h iskani ničli. Smiselno pa sledi vprašanje, katerim pogojem mora biti zadoščeno, da pa 
+V zgoraj naštetih primerih torej Newtonova metoda ne konvergira k iskani ničli. Smiselno pa sledi vprašanje, katerim pogojem mora biti zadoščeno, da pa 
 vednarle dobimo pravilno rešitev. To nam poda sledeči izrek:
 \begin{izrek} 
     Naj iteracijska funkcija $g$ na intervalu $I = [ \alpha - \delta,\alpha + \delta ]$ zadošča Lipschitzovemu pogoju
@@ -1072,7 +1118,7 @@ Dodatno informacijo o območju konvergence navadne iteracije nam dajo tudi vredn
 Kot je pri numeričnih metodah to običajno, nas zanima njihovo obnašanje po več ponovitvah iteriacije. Pomembno je, kako hitro pridemo do rešitve saj želimo računanje čim manjkrat
 ponoviti in dobiti najboljši možen rezultat.
 
-Definirajmo si \textit{red konvergence}. Idejno je to število točnih decimalnih mest, ki jih pridobimo z vsakim korakom iteracije. 
+Definirajmo \textit{red konvergence}. Idejno je to število točnih decimalnih mest, ki jih pridobimo z vsakim korakom iteracije. 
 \begin{definicija}\label{red_konv}
     Naj zaporedje $(x_{r})$ konvergira k $\alpha.$ Red konvergence je enak p, če obstajata taki števili $C_{1}, C_{2},$ da velja
     \[
@@ -1119,8 +1165,8 @@ Vidimo, da je potrebno ločiti dva primera:
     od koder sledi linearna konvergenca.
 \end{itemize}
 \subsubsection{Newton--Raphsonova metoda v višjih dimenzijah}
-Newtonovo metodo se da enostavno posplošiti za iskanje ničel vektorskih funkcij. Recimo, da imamo funkcijo $F:\mathbb{R^n} \rightarrow \mathbb{R^n}$ in iščemo tak
-vektor $x^{*} \in \mathbb{R^n},$ za katerega bo $F(x^{*}) = (f_{1}(x^{*}_{1}),\ldots,f_{n}(x^{*}_{n})) = (0,\ldots,0).$
+Newtonovo metodo se da enostavno posplošiti za iskanje ničel vektorskih funkcij. Recimo, da imamo funkcijo $F:\mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$ in iščemo tak
+vektor $x^{*} \in \mathbb{R}^{n},$ za katerega bo $F(x^{*}) = (f_{1}(x^{*}_{1}),\ldots,f_{n}(x^{*}_{n})) = (0,\ldots,0).$
 
 Podobno kot zgoraj tvorimo zaporedje
 \[
@@ -1158,8 +1204,8 @@ Izpeljava je podobna tisti v eni dimenziji, preko razvoja v Taylorjevo vrsto. Re
 \]
 V okolici rešitve enačbe ima metoda kvadratično konvergenco, težava pa je v iskanju začetnega približka.
 \subsection{Fisher's scoring}
-Fisher's scoring algoritem je variacija v prejšnjem razdelku opisanega Newton -- Raphsonovega algoritma, ki se v statistiki uporablja za numerično reševanje enačb največjega 
-verjetja. Poimenovana je po Ronaldu Fisherju, enem najpomembenjših angleških statistikov dvajsetega stoletja.
+Fisher's scoring algoritem je variacija v prejšnjem razdelku opisanega Newton -- Raphsonovega algoritma, ki se v statistiki uporablja za numerično reševanje enačb 
+verjetja. Poimenovana je po Ronaldu Fisherju, enemu najpomembenjših angleških statistikov dvajsetega stoletja.
 
 Ponovimo najprej nekaj terminologije. Funkcija zbira je gradient logaritemske funkcije verjetja po ocenjevanem parametru.
 Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher) information matrix}) je definirana kot 
@@ -1168,7 +1214,7 @@ Informacijska (oziroma Fisherjeva Informacijska) matrika (angl. \textit{(Fisher)
 \]
 Fisher scoring algoritem je po zgornjih oznakah 
 \begin{align}
-    \theta{n + 1} = \theta_{n} - FI(\theta)^{-1}\nabla L(\theta)
+    \theta{n + 1} = \theta_{n} - FI(\theta)^{-1}\left(\frac{\partial}{\partial\theta} L(\theta)\right)
 \end{align}
 %\subsubsection{Fisherjeva informacijska matrika in informacijska enakost}
 %V sledečem razdelku bomo utemeljili uporabo Fisher scoring algoritma in prikazali njegovo glavno prednost pred običajno Newtonovo iteracijo, opisano v poglavju \ref{nr}.
@@ -1214,7 +1260,7 @@ po informacijski enakosti pa velja
 torej Fisherjeva informacija je za kanonične modele enaka Hessejevi matriki logaritemske funkcije verjetja! Poleg tega pa velja še
 \begin{align}
     \mathrm{FI}(\theta) &= \mathrm{E}[(\frac{\partial}{\partial\theta} L(\theta))(\frac{\partial}{\partial\theta} L(\theta))^\top] \nonumber\\
-    &= \mathrm{E}[\left(\frac{\partial}{\partial\partial\theta} L(\theta) - \mathrm{E}[\frac{\partial}{\partial\theta} L(\theta)]\right)\left(\frac{\partial}{\partial\theta} L(\theta) - \mathrm{E}[\frac{\partial}{\partial\theta} L(\theta)]\right)^\top] \nonumber \\
+    &= \mathrm{E}[\left(\frac{\partial}{\partial\theta} L(\theta) - \mathrm{E}[\frac{\partial}{\partial\theta} L(\theta)]\right)\left(\frac{\partial}{\partial\theta} L(\theta) - \mathrm{E}[\frac{\partial}{\partial\theta} L(\theta)]\right)^\top] \nonumber \\
     &= \mathrm{Var}[\frac{\partial}{\partial\theta} L(\theta)],
 \end{align}
 variančno kovariančne matrike pa so pozitivno semidefinitne, kar pomeni da imamo konstanten algoritem.
@@ -1224,7 +1270,7 @@ Povzemimo; za kanonične povezovalne funkcije smo dokazali enakost med Fisherjev
 odvodov in pridobimo pozitivno semidefinitno matriko v imenovalcu. Koristi uporabe kanoničnih povezovalnih funkcij so toraj očitne.
 
 \subsubsection{Fisher's scoring v logističnem modelu}
-Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{ell},\eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
+Poglejmo za trenutek nazaj v poglavje \ref{ocenpar}, natančneje k enačbam \eqref{prvi} in \eqref{drugi}. Iz prejšnjega razdelka vemo tudi, da velja
 \[
     \mathrm{FI}(\theta) = \mathbb{E}[-\frac{\partial^2}{\partial\theta^2} L(\theta)] \overset{\eqref{drugi}}{=} X^\top v(\theta)X = -\frac{\partial^2}{\partial\theta^2} L(\theta),
 \]
