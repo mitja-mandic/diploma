@@ -46,11 +46,18 @@ def f(x, y):
     return np.exp(intercept + x * slope + y * slope1)/ (1 + np.exp(intercept + x * slope + y * slope1))
 
 def main():
-    x = np.linspace(30,100,1000)
-    y = np.linspace(50,200,1000)
+    x = np.linspace(-10,10,1000)
+    y = np.linspace(0,10,1000)
     X,Y = np.meshgrid(x,y)
-    y_probit = np.exp(intercept_probit + x * slope_probit)/ (1 + np.exp(intercept_probit + x * slope_probit))
-    y_logit = np.exp(intercept_logit + x * slope_logit)/ (1 + np.exp(intercept_logit + x * slope_logit))
+    
+    #LOGIT IN PROBIT SKUPAJ
+    #y_probit = np.exp(intercept_probit + x * slope_probit)/ (1 + np.exp(intercept_probit + x * slope_probit))
+    #y_logit = np.exp(intercept_logit + x * slope_logit)/ (1 + np.exp(intercept_logit + x * slope_logit))
+    
+    #samo sigmoida
+    f = np.exp(x)/(1+np.exp(x))
+
+
     #Z = f(X,Y)
     #fig = plt.figure()
     #ax = plt.axes(projection='3d')
@@ -61,9 +68,10 @@ def main():
     
     
     plt.figure()
-    plt.plot(x, y_logit, label = 'Logit')
-    plt.plot(x,y_probit, label = "probit")
-    plt.xlabel('$x$')
+    plt.plot(x, f)
+    #plt.plot(x,y_probit, label = "Probit")
+    #plt.xlabel('$x$')
+
     #plt.ylabel('$\exp(x)$')
 
     #plt.plot(podatki_hrosci[['conc']].values,fitted, 'o')
