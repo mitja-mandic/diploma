@@ -14,6 +14,7 @@ new_path = os.path.relpath('..\\podatki\\podatki.txt', cur_path)
 podatki = pd.read_csv("diploma\\koda\\podatki.txt")
 podatki['dodatna'] = 1
 matrika = podatki[['dodatna','TEMPERATURE','PRESSURE']].values
+#matrika = podatki[['dodatna','PRESSURE']].values
 vrednosti_y = podatki[['O_RING_FAILURE']].values
 #print(podatki[['dodatna']])
 #print(podatki.columns)
@@ -32,51 +33,51 @@ resitev_logit = izracunaj_koeficiente(50, matrika, vrednosti_y)
 #
 #resitev = izracunaj_koeficiente(20, matrika, vrednost_y, skupine)
 
-fitted = resitev_probit['p']
-intercept_probit = resitev_probit['parametri'][0]
-slope_probit = resitev_probit['parametri'][1]
-
-
+#fitted = resitev_probit['p']
+#intercept_probit = resitev_probit['parametri'][0]
+#slope_probit = resitev_probit['parametri'][1]
+#
+#
 intercept_logit = resitev_logit['parametri'][0]
 slope_logit = resitev_logit['parametri'][1]
 slope_logit1 = resitev_logit['parametri'][2]
-#slope1 = resitev['parametri'][2]
-print(intercept_logit,slope_logit,slope_logit1)
+
+#print(intercept_logit,slope_logit,slope_logit1)
 
 def f(x, y):
     return np.exp(intercept_logit + x * slope_logit + y * slope_logit1)/ (1 + np.exp(intercept_logit + x * slope_logit + y * slope_logit1))
 
 def main():
-    x = np.linspace(-10,10,1000)
-    y = np.linspace(0,1,1000)
+    x = np.linspace(30,100,2000)
+    y = np.linspace(-100,700,1000)
     X,Y = np.meshgrid(x,y)
     
     #LOGIT IN PROBIT SKUPAJ
-    y_probit = np.exp(intercept_probit + x * slope_probit)/ (1 + np.exp(intercept_probit + x * slope_probit))
+    #y_probit = np.exp(intercept_probit + x * slope_probit)/ (1 + np.exp(intercept_probit + x * slope_probit))
     y_logit = np.exp(intercept_logit + x * slope_logit)/ (1 + np.exp(intercept_logit + x * slope_logit))
     
     #samo sigmoida
-    f = np.exp(x)/(1+np.exp(x))
+    #f = np.exp(x)/(1+np.exp(x))
 
     #probit sigmoida
     #f = np.exp(intercept_probit-slope_probit*x)/(1+np.exp(8.77495-0.13510*x))
 
 
 
-    #Z = f(X,Y)
-    #fig = plt.figure()
-    #ax = plt.axes(projection='3d')
-    #ax.plot_surface(X, Y, Z,cmap='cividis',edgecolor='none')
+    Z = f(X,Y)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot_surface(X, Y, Z,cmap='cividis',edgecolor='none')
     
     
     
     
     
-    plt.figure()
+    #plt.figure()
     #plt.plot(x,y_logit, label = "Logit")
     #plt.plot(x,y_probit, label = "Probit")
     #plt.xlabel('$x$')
-    plt.plot(x,f)
+    #plt.plot(x,f)
     
     #plt.ylabel('$\exp(x)$')
 
